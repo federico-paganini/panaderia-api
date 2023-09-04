@@ -1,0 +1,13 @@
+body {
+    background-color: whitesmoke !important;
+}
+
+.formulary {
+   background-color:antiquewhite !important;
+    box-shadow: 0 0 0 2px rgb(255, 255, 255),
+    0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+}
+
+.bold {
+    font-weight: bold !important;
+}
