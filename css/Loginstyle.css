@@ -16,3 +16,30 @@ body {
 .img-logolog {
     max-width: 60% !important;
 }
+
+.form-activo {
+    opacity: 1;
+    max-height: 500px;
+    transition: opacity 1s ease-in-out, max-height 0.8s ease-in-out;
+}
+
+.form-inactivo {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 1s ease-in-out, max-height 0.8s ease-in-out;
+}
+
+#block-log, #block-reg {
+    background: transparent;
+    border: 0;
+    outline: none;
+    color:black;
+}
+
+.barra {
+    background: linear-gradient(to right,  #ff7010, #ff2b06);
+    width: 0;
+    transition: width 0.3s ease;
+    height: calc(100% - 2px);
+}
