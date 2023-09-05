@@ -18,12 +18,13 @@
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card formulary">
             <div class="card-body">
-
+                <div class="form-group text-center">
+                    <img src="css/img/LogoPanadería.png" alt="Las Delicias"
+                        class="img-fluid img-logolog align-items-center mx-auto">
+                </div>
                 <div class="form-group text-center mb-3 mt-3">
-                    <div id="form-selector">
-                        <button id="block-log">Iniciar Sesión</button>
-                        <button id="block-reg">Registrarse</button>
-                    </div>
+                        <button id="block-log" data-form="form-log" class="btn btn-primary">Iniciar Sesión</button>
+                        <button id="block-reg" data-form="form-reg" class="btn btn-success">Registrarse</button>
                 </div>
 
                 <form method="post" id="form-log">
@@ -39,7 +40,7 @@
                     </div>
                 </form>
 
-                <form action="post" id="form-reg">
+                <form action="post" id="form-reg" style="display: none">
                     <div class="form-group mb-3">
                         <input type="text" name="nuevousuario" id="nuser" class="form-control"
                             placeholder="Nombre de usuario" required>
@@ -74,9 +75,11 @@
             </div>
         </div>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
+    <script src="js/login.js"></script>
 </body>
 
 </html>

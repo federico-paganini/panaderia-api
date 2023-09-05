@@ -1,13 +1,18 @@
 body {
-    background-color: whitesmoke !important;
+    background-image: url("img/logback.jpg");
+    background-color: rgb(51, 47, 48);
+    height: auto;
+    background-repeat: repeat;
 }
 
 .formulary {
-   background-color:antiquewhite !important;
+    background-image: url("img/cardback.jpg");
+    background-size: cover;
+    background-color: rgb(163, 163, 163) !important;
     box-shadow: 0 0 0 2px rgb(255, 255, 255),
-    0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+        0.3em 0.3em 1em rgba(255, 255, 255, 0.925);
 }
 
-.bold {
-    font-weight: bold !important;
+.img-logolog {
+    max-width: 60% !important;
 }
