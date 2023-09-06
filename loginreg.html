@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="css/Loginstyle.css">
+    <link rel="stylesheet" href="css/loginstyle.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
@@ -18,19 +18,20 @@
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card formulary">
             <div class="card-body">
+                <!--Logo de la Panadería-->
                 <div class="form-group text-center">
                     <img src="css/img/LogoPanadería.png" alt="Las Delicias"
                         class="img-fluid img-logolog align-items-center mx-auto">
                 </div>
+                <!--Botones intercambio de formularios-->
                 <div class="form-group text-center mb-3 mt-3">
-                    <div class="border border-black rounded" style="display: inline-block;">
-                        <div class="barra"></div>
+                    <div class="border border-black rounded" id="form-seleccion">
                         <button id="block-log" data-form="form-log" class="btn btn-primary">Iniciar Sesión</button>
                         <button id="block-reg" data-form="form-reg" class="btn btn-success">Registrarse</button>
+                        <div class="barra"></div>
                     </div>
-                    
                 </div>
-
+                <!--Formulario de Inicio de Sesión-->
                 <form method="post" id="form-log" class="form-activo">
                     <div class="form-group mb-3">
                         <input type="text" name="usuario" id="usuario" class="form-control" placeholder="Usuario">
@@ -43,7 +44,7 @@
                         <button type="submit" id="btn-log" class="btn btn-primary">Ingresar</button>
                     </div>
                 </form>
-
+                <!--Formulario de Registro-->
                 <form action="post" id="form-reg" class="form-inactivo">
                     <div class="form-group mb-3">
                         <input type="text" name="nuevousuario" id="nuser" class="form-control"

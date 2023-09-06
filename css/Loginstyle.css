@@ -35,11 +35,22 @@ body {
     border: 0;
     outline: none;
     color:black;
+    position: relative;
+    z-index: 1;
+}
+
+#form-seleccion {
+    display: inline-block;
+    position: relative;
 }
 
 .barra {
-    background: linear-gradient(to right,  #ff7010, #ff2b06);
+    position: absolute;
+    background: linear-gradient(to right,  #1070ff, #1706ff);
+    border-radius: inherit;
     width: 0;
     transition: width 0.3s ease;
     height: calc(100% - 2px);
+    z-index: 0;
+    top: 0;
 }
