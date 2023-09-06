@@ -1,0 +1,45 @@
+body {
+    background-image: url("img/logback.jpg");
+    background-color: rgb(51, 47, 48);
+    height: auto;
+    background-repeat: repeat;
+}
+
+.formulary {
+    background-image: url("img/cardback.jpg");
+    background-size: cover;
+    background-color: rgb(163, 163, 163) !important;
+    box-shadow: 0 0 0 2px rgb(255, 255, 255),
+        0.3em 0.3em 1em rgba(255, 255, 255, 0.925);
+}
+
+.img-logolog {
+    max-width: 60% !important;
+}
+
+.form-activo {
+    opacity: 1;
+    max-height: 500px;
+    transition: opacity 1s ease-in-out, max-height 0.8s ease-in-out;
+}
+
+.form-inactivo {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 1s ease-in-out, max-height 0.8s ease-in-out;
+}
+
+#block-log, #block-reg {
+    background: transparent;
+    border: 0;
+    outline: none;
+    color:black;
+}
+
+.barra {
+    background: linear-gradient(to right,  #ff7010, #ff2b06);
+    width: 0;
+    transition: width 0.3s ease;
+    height: calc(100% - 2px);
+}
