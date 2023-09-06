@@ -1,12 +1,12 @@
 body {
-    background-image: url("img/logback.jpg");
+    background-image: url("img/logback.jpg") !important;
     background-color: rgb(51, 47, 48);
     height: auto;
     background-repeat: repeat;
 }
 
 .formulary {
-    background-image: url("img/cardback.jpg");
+    background-image: url("img/cardback.jpg") !important;
     background-size: cover;
     background-color: rgb(163, 163, 163) !important;
     box-shadow: 0 0 0 2px rgb(255, 255, 255),
