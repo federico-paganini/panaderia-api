@@ -8,8 +8,8 @@
     <title>Iniciar Sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-        crossorigin="anonymous"></script>
-    <link href="css/loginstyle.css" rel="stylesheet" >
+    crossorigin="anonymous"></script>
+    <link href="css/loginstyle.css" rel="stylesheet">
 </head>
 
 <body>
@@ -32,11 +32,12 @@
                 <!--Formulario de Inicio de Sesión-->
                 <form method="post" id="form-log" class="form-activo">
                     <div class="form-group mb-3">
-                        <input type="text" name="usuario" id="usuario" class="form-control" placeholder="Usuario">
+                        <input type="text" name="usuario" id="usuario" class="form-control" placeholder="Usuario"
+                            required>
                     </div>
                     <div class="form-group mb-3">
                         <input type="password" name="contraseña" id="contraseña" class="form-control"
-                            placeholder="Contraseña">
+                            placeholder="Contraseña" minlength="6" required>
                     </div>
                     <div class="form-group text-center mb-3 mt-3">
                         <button type="submit" id="btn-log" class="btn btn-primary">Ingresar</button>
@@ -49,22 +50,23 @@
                             placeholder="Nombre de usuario" required>
                     </div>
                     <div class="form-group mb-3">
-                        <input type="email" name="nemail" id="nemail" class="form-control" placeholder="E-Mail">
+                        <input type="email" name="nemail" id="nemail" class="form-control" placeholder="E-Mail"
+                            required>
                     </div>
                     <div class="form-group mb-3">
                         <input type="tel" name="nphone" id="nphone" class="form-control" placeholder="Celular" required>
                     </div>
                     <div class="form-group mb-3">
                         <input type="password" name="npass" id="npass" class="form-control" placeholder="Contraseña"
-                            required>
+                            minlength="6" required>
                     </div>
                     <div class="form-group mb-3">
                         <input type="password" name="confpass" id="confpass" class="form-control"
-                            placeholder="Repetir Contraseña" required>
+                            placeholder="Repetir Contraseña" minlength="6" required>
                     </div>
                     <div class="form-group mb-3">
-                        <input type="radio" name="usertype" id="normaluser" class="form-check-imput"
-                            style="font-weight: bold;" value="normalu" required>
+                        <input type="radio" name="usertype" id="normaluser" class="form-check-imput" value="normalu"
+                            required>
                         <label for="normaluser" class="form-check-label">Receptor de Pedidos</label>
                         <input type="radio" name="usertype" id="admin" class="form-check-imput" value="administrator">
                         <label for="admin" class="form-check-label">Administrador</label>
