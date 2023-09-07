@@ -5,6 +5,10 @@ body {
     background-repeat: repeat;
 }
 
+#container-forms {
+    min-height: 100vh;
+}
+
 .formulary {
     background-image: url("img/cardback.jpg") !important;
     background-size: cover;
