@@ -1,0 +1,16 @@
+body {
+    background-image: url(img/backgroundmain.jpg);
+    background-repeat: repeat;
+}
+
+#container-forms {
+    min-height: 100vh;
+}
+
+#logocontainer {
+    height: 30vh;
+}
+
+#buttonbox {
+    background-color: rgba(255, 255, 255, 0.767);
+}
