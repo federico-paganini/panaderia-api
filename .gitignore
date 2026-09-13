@@ -1,0 +1,6 @@
+# Rust builds. NOT `/target`: the crate lives in `backend/`, and a root-anchored
+# pattern leaves `backend/target` — hundreds of megabytes — unignored.
+target/
+
+# Env Variables
+.env
