@@ -25,6 +25,18 @@ export const ADDRESS = {
 	oneLine: 'Lavalleja 714 · Las Piedras, Canelones'
 } as const;
 
+/**
+ * Opening hours. The counter opens before the phone is answered and closes
+ * after it, so these are two different ranges and the site must not flatten
+ * them into one — someone who walks over at 20:30 needs to know the door is
+ * open even though nobody will pick up.
+ */
+export const HOURS = {
+	days: 'Lunes a sábado',
+	inPerson: '7:30 a 21:00',
+	phone: '8:00 a 20:00'
+} as const;
+
 export const CONTACT = {
 	phone: '+598 2364 1201',
 	/** Tel: URI — no spaces, E.164. */

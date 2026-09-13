@@ -5,7 +5,7 @@
 	import SeoHead from '$lib/SeoHead.svelte';
 	import { LEGAL_ENTITY } from '$lib/legal/entity';
 	import { TERMS_UPDATED } from '$lib/legal/versions';
-	import { SITE } from '$lib/site';
+	import { HOURS, SITE } from '$lib/site';
 </script>
 
 <SeoHead
@@ -65,8 +65,11 @@
 
 <h3>3.3 Disponibilidad</h3>
 <p>
+	Atendemos de <strong>{HOURS.days}</strong>: por teléfono de {HOURS.phone}, y en el local de
+	{HOURS.inPerson}. Fuera de ese horario la respuesta puede demorar hasta el día siguiente.
+</p>
+<p>
 	No garantizamos que el canal esté disponible en todo momento ni un plazo determinado de respuesta.
-	Fuera del horario de atención, la respuesta puede demorar.
 </p>
 
 <h2>4. Uso aceptable</h2>
