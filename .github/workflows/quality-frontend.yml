@@ -1,0 +1,103 @@
+name: Quality gate (frontend)
+
+# Split from the backend gate by a `paths` filter: a change under `backend/`
+# must not spend fifteen minutes rebuilding the site, and vice versa. The
+# trade-off this buys, and what it costs if branch protection is ever turned
+# on, is written up in `docs/CI.md` — not in comments here.
+on:
+  push:
+    branches: [main, claude-master]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/quality-frontend.yml'
+  pull_request:
+    branches: [main, claude-master]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/quality-frontend.yml'
+
+# A PR re-run is cancelled when a new commit lands on the branch. A push run is
+# never cancelled: every commit headed for a deployable branch has to finish its
+# CI, or the status check on that commit is a hole rather than a result.
+concurrency:
+  group: quality-frontend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  quality:
+    name: Audit, typecheck, lint, unit, build, e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Read-only gate: nothing here needs authenticated git, so the token
+          # should not be left behind in `.git/config`.
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          # Reads the pinned version from `packageManager`, so CI and the
+          # laptop cannot drift.
+          package_json_file: frontend/package.json
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dependency vulnerability audit
+        run: pnpm audit --audit-level high
+
+      # Installed before the unit step, not just before E2E: the Vitest `client`
+      # project runs component specs in headless chromium, so the browser has to
+      # be there by then.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Typecheck (svelte-check)
+        run: pnpm check
+
+      - name: Lint (Prettier + ESLint)
+        run: pnpm lint
+
+      - name: Unit tests (Vitest)
+        run: pnpm test:unit --run
+
+      - name: Build (adapter-vercel)
+        run: pnpm build
+
+      # The config sees CI=true and skips its own rebuild — the step above
+      # already produced the output `pnpm preview` serves.
+      - name: E2E tests (Playwright)
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 14

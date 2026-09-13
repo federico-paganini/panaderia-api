@@ -1,0 +1,80 @@
+# Dependabot — automated dependency PRs.
+# https://docs.github.com/code-security/dependabot
+#
+# All PRs target `claude-master`, the top of the promotion flow
+# (claude-master → main). Bumps enter at the integration branch so every
+# working branch inherits current deps — no lockfile drift — instead of landing
+# on `main` behind the branch people actually work on.
+#
+# TWO THINGS THAT BITE:
+#
+#  1. `claude-master` MUST EXIST before this reaches the default branch.
+#     Dependabot errors on every run against a target branch it cannot find.
+#  2. Dependabot reads this file from the DEFAULT branch (`main`), so editing it
+#     on a working branch changes nothing until the edit lands on `main`.
+#
+# This is a monorepo, so each ecosystem points at its own directory. That lines
+# up with the `paths` filters in `.github/workflows/`: an npm bump touches
+# `frontend/**` and runs only the frontend gate, a cargo bump only the backend
+# one, and an actions bump runs whichever gate's file it edited. See
+# `docs/CI.md`.
+
+version: 2
+
+updates:
+  # --- Frontend: npm packages via frontend/pnpm-lock.yaml -------------------
+  - package-ecosystem: npm
+    directory: /frontend
+    target-branch: claude-master
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+      timezone: America/Montevideo
+    open-pull-requests-limit: 5
+    labels: [dependencies, frontend]
+    # Routine minor/patch bumps arrive as one weekly rollup to review; majors
+    # get their own PR, which is where the breakage lives.
+    groups:
+      frontend-dev:
+        dependency-type: development
+        update-types: [minor, patch]
+      frontend-prod:
+        dependency-type: production
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore(deps)
+      include: scope
+
+  # --- Backend: cargo crates via backend/Cargo.lock -------------------------
+  - package-ecosystem: cargo
+    directory: /backend
+    target-branch: claude-master
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+      timezone: America/Montevideo
+    open-pull-requests-limit: 5
+    labels: [dependencies, backend]
+    groups:
+      backend-crates:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore(deps)
+      include: scope
+
+  # --- The actions used by .github/workflows/* ------------------------------
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: claude-master
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+      timezone: America/Montevideo
+    open-pull-requests-limit: 3
+    labels: [dependencies, ci]
+    commit-message:
+      prefix: chore(ci)
+      include: scope

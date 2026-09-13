@@ -1,0 +1,75 @@
+name: Quality gate (backend)
+
+# See `docs/CI.md` for the branch model, the path-filter trade-off and the
+# runbook.
+on:
+  push:
+    branches: [main, claude-master]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/quality-backend.yml'
+  pull_request:
+    branches: [main, claude-master]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/quality-backend.yml'
+
+concurrency:
+  group: quality-backend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  quality:
+    name: Audit, format, clippy, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The runner ships a current stable toolchain; only the components are
+      # missing, so this avoids a third-party action for two lines.
+      - name: Add rustfmt and clippy
+        run: rustup component add rustfmt clippy
+
+      # `~/.cargo/bin` is in the cache on purpose: it is where `cargo-audit`
+      # lands, so the audit tool compiles once rather than on every run.
+      - name: Cache cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked --quiet || true
+
+      - name: Dependency vulnerability audit
+        run: cargo audit
+
+      # Formatting first: it needs no compilation, so a formatting-only failure
+      # reports in seconds instead of after a full build.
+      - name: Verify formatting
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test
