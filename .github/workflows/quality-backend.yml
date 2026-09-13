@@ -20,6 +20,8 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
+  # Pinned so the audit tool is reproducible AND so its cache key is stable.
+  CARGO_AUDIT_VERSION: '0.22.2'
 
 defaults:
   run:
@@ -44,21 +46,34 @@ jobs:
       - name: Add rustfmt and clippy
         run: rustup component add rustfmt clippy
 
-      # `~/.cargo/bin` is in the cache on purpose: it is where `cargo-audit`
-      # lands, so the audit tool compiles once rather than on every run.
-      - name: Cache cargo
+      - name: Cache cargo registry and build
         uses: actions/cache@v6
         with:
           path: |
-            ~/.cargo/bin
             ~/.cargo/registry
             ~/.cargo/git
             backend/target
           key: cargo-${{ runner.os }}-${{ hashFiles('backend/Cargo.lock') }}
           restore-keys: cargo-${{ runner.os }}-
 
+      # A SEPARATE cache, keyed on the tool's own version rather than on the
+      # project's lockfile. Sharing the cache above was a mistake: it meant
+      # every dependency bump invalidated the entry and recompiled cargo-audit
+      # from source — exactly when Dependabot generates the most runs. Keyed
+      # this way the compile is paid once per tool version, for the life of the
+      # repository.
+      - name: Cache cargo-audit
+        id: audit-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cargo/bin/cargo-audit
+          key: cargo-audit-${{ runner.os }}-${{ env.CARGO_AUDIT_VERSION }}
+
       - name: Install cargo-audit
-        run: cargo install cargo-audit --locked --quiet || true
+        if: steps.audit-cache.outputs.cache-hit != 'true'
+        # No `|| true`: a failure to install the audit tool must fail the gate,
+        # not silently skip the audit.
+        run: cargo install cargo-audit --locked --version ${{ env.CARGO_AUDIT_VERSION }}
 
       - name: Dependency vulnerability audit
         run: cargo audit
