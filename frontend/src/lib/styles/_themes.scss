@@ -1,0 +1,92 @@
+// Colour, as CSS custom properties — the only place in the codebase allowed to
+// hold a literal colour. Components reference `var(--color-*)` and never a raw
+// hex or rgba(); `src/lib/styles/tokens.spec.ts` fails the build if one slips
+// in. That rule is what makes a second theme cheap: adding one is writing a
+// block here, not auditing every component.
+//
+// This file EMITS css, so it is included once from `src/app.scss` and is NOT
+// forwarded by `_index.scss` — a component that `@use`s the styles entry must
+// not re-emit the palette.
+//
+// Three selectors, deliberately:
+//   :root                                     the light palette, always defined
+//   :root:not([data-theme='light']) + media   the reader's OS preference
+//   :root[data-theme='dark']                  an explicit choice, if a toggle
+//                                             is ever added (no UI today)
+// Every colour has its definition on bare `:root`. Nothing is defined only
+// inside the media query, so a colour can never go undefined.
+
+:root {
+	color-scheme: light;
+
+	// Identity — spec §4, direction B.
+	--color-brand: #003898; // headings, icon ink
+	--color-brand-soft: #1e5a9c; // links, secondary accents
+
+	// Surfaces.
+	--color-canvas: #f7f1e4; // page background (cream)
+	--color-slab: #efe2c4; // diagonal background slabs (butter)
+	--color-paper: #fffdf8; // sticker paper, cards
+
+	// Accents.
+	--color-wheat: #c29853; // primary CTA background
+	--color-wheat-light: #eec882; // handwritten accent over photos
+
+	// Text.
+	--color-ink: #3a3328; // body
+	--color-ink-muted: #6b6151; // secondary prose, captions
+	--color-cta-text: #1f160a; // on the gold CTA — never white, 2.65:1
+
+	// Lines and depth. The shadow is a colour, so it lives here too: on a dark
+	// canvas a warm drop shadow reads as haze, and it has to darken.
+	--color-border: #e0d3b8;
+	--color-border-strong: #cdbb99;
+	--color-shadow: rgb(20 15 10 / 30%); // spec §6: the paper sticker's shadow
+	--color-overlay: rgb(20 15 10 / 45%); // hero photo legibility gradient
+}
+
+// --- Dark ------------------------------------------------------------------
+// The prose surfaces below (canvas, paper, ink, border, brand, links) are
+// contrast-verified against WCAG AA — see the table in
+// `docs/landing-design-spec.md` §4.
+//
+// PENDING, and deliberately so: the landing's own surfaces do not yet have a
+// design in dark. `--color-slab`, `--color-paper` and `--color-shadow` carry
+// working values so nothing renders undefined, but "paper" and "a tone darker
+// than the canvas" are ideas that have to be re-decided against real
+// photography, which we do not have yet. Revisit when the photos land; the
+// legal pages are already correct.
+@mixin dark-palette {
+	color-scheme: dark;
+
+	--color-brand: #8fb6f0; // the logo blue lightened; 8.75:1 on canvas
+	--color-brand-soft: #a9c8f5; // 10.61:1 on canvas
+
+	--color-canvas: #191510;
+	--color-slab: #231d15;
+	--color-paper: #2a2219;
+
+	// Unchanged: the gold CTA keeps its identity, and #1f160a on it is 6.72:1
+	// in either theme.
+	--color-wheat: #c29853;
+	--color-wheat-light: #eec882;
+
+	--color-ink: #ede4d3; // 14.39:1 on canvas
+	--color-ink-muted: #b3a895; // 7.74:1 on canvas
+	--color-cta-text: #1f160a;
+
+	--color-border: #3a3025;
+	--color-border-strong: #4d4031;
+	--color-shadow: rgb(0 0 0 / 55%);
+	--color-overlay: rgb(0 0 0 / 55%);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		@include dark-palette;
+	}
+}
+
+:root[data-theme='dark'] {
+	@include dark-palette;
+}

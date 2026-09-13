@@ -1,0 +1,7 @@
+// One-line entry for components: `@use 'styles' as *;`
+//
+// `_themes.scss` is intentionally absent: it emits the palette and is included
+// once from `src/app.scss`. Forwarding it here would repeat every custom
+// property in every component's compiled stylesheet.
+@forward 'tokens';
+@forward 'mixins';

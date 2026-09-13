@@ -1,0 +1,57 @@
+@use 'sass:map';
+@use 'tokens' as *;
+
+// Min-width media query by breakpoint name. Mobile-first: write the small
+// layout as the base and widen inside the mixin.
+@mixin breakpoint($name) {
+	$width: map.get($breakpoints, $name);
+
+	@if not $width {
+		@error "Unknown breakpoint `#{$name}`. Known: #{map.keys($breakpoints)}.";
+	}
+
+	@media (min-width: $width) {
+		@content;
+	}
+}
+
+// The page's side gutter, in one place. Spec §10 puts a floor of 16px on it at
+// every width, and the body must never scroll horizontally — so this sets the
+// inline padding and nothing else. Give the element its vertical padding with
+// `padding-block`, never a `padding` shorthand, which would zero the sides.
+@mixin gutter {
+	padding-inline: max(#{$gutter-min}, env(safe-area-inset-left));
+
+	@include breakpoint(md) {
+		padding-inline: $space-8;
+	}
+}
+
+// A centred column at the design's reference width.
+@mixin content-shell($width: $content-width) {
+	width: 100%;
+	max-width: $width;
+	margin-inline: auto;
+	@include gutter;
+}
+
+// Spec §9: everything respects the reader's motion preference. Wrap any
+// transition, transform or animation that is decoration rather than feedback.
+@mixin motion-safe {
+	@media (prefers-reduced-motion: no-preference) {
+		@content;
+	}
+}
+
+// Off-screen but readable by assistive tech — for a label a sighted reader gets
+// from the layout.
+@mixin visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}

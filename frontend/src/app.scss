@@ -1,0 +1,80 @@
+@use 'lib/styles' as *;
+@use 'lib/styles/themes';
+
+// Reset and base. Everything below is element-level; component styles live with
+// their components.
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	// Spec §10: the body must never scroll horizontally. `clip` rather than
+	// `hidden` because `hidden` on an ancestor silently kills `position: sticky`
+	// in every descendant, and the nav will want it.
+	overflow-x: clip;
+	// The hero's anchor links land under the fixed nav without this.
+	scroll-padding-top: $space-20;
+
+	@include motion-safe {
+		scroll-behavior: smooth;
+	}
+}
+
+body {
+	margin: 0;
+	background: var(--color-canvas);
+	color: var(--color-ink);
+	font-family: $font-body;
+	font-size: $font-size-base;
+	font-weight: $weight-regular;
+	line-height: $leading-normal;
+	// Warm greys on a cream ground go muddy with subpixel antialiasing on macOS.
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	margin: 0;
+	font-family: $font-display;
+	font-weight: $weight-bold;
+	line-height: $leading-tight;
+	color: var(--color-brand);
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+a {
+	color: var(--color-brand-soft);
+	text-underline-offset: 0.15em;
+}
+
+img,
+picture,
+svg,
+video {
+	display: block;
+	max-width: 100%;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+}
+
+// One visible focus ring for the whole site. `:focus-visible` only, so a mouse
+// click does not draw it, and an offset so it never sits on top of the glyphs.
+:focus-visible {
+	outline: 2px solid var(--color-brand);
+	outline-offset: 3px;
+	border-radius: $radius-xs;
+}
