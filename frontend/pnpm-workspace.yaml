@@ -1,0 +1,5 @@
+allowBuilds:
+  # Only used by `sass --watch`, which we never run — Vite compiles and watches
+  # the SCSS itself. Declining it keeps a native build out of every install.
+  '@parcel/watcher': false
+  esbuild: true
