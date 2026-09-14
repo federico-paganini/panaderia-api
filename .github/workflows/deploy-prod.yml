@@ -4,7 +4,7 @@
 # here. That only orders correctly when the quality gate is a REQUIRED status
 # check, so nothing can land on main without passing — and the gates are not
 # required in this repository, because a path-filtered workflow that gets
-# skipped never reports a status (see docs/CI.md). Chaining on the gate's own
+# skipped never reports a status (see frontend/docs/CI.md). Chaining on the gate's own
 # completion is what actually guarantees a red gate never ships.
 #
 # Consequence worth knowing: a push to main that touches only `backend/` or

@@ -17,7 +17,7 @@
 # up with the `paths` filters in `.github/workflows/`: an npm bump touches
 # `frontend/**` and runs only the frontend gate, a cargo bump only the backend
 # one, and an actions bump runs whichever gate's file it edited. See
-# `docs/CI.md`.
+# the repo-wide `docs/CI.md`, which is where anything spanning both stacks lives.
 
 version: 2
 

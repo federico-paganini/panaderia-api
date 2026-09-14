@@ -3,7 +3,8 @@ name: Quality gate (frontend)
 # Split from the backend gate by a `paths` filter: a change under `backend/`
 # must not spend fifteen minutes rebuilding the site, and vice versa. The
 # trade-off this buys, and what it costs if branch protection is ever turned
-# on, is written up in `docs/CI.md` — not in comments here.
+# on, is written up in `frontend/docs/CI.md` and the repo-wide `docs/CI.md` —
+# not in comments here.
 on:
   push:
     branches: [main, claude-master]

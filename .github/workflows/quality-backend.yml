@@ -1,7 +1,7 @@
 name: Quality gate (backend)
 
-# See `docs/CI.md` for the branch model, the path-filter trade-off and the
-# runbook.
+# See `backend/docs/CI.md` for this gate and its open items, and the repo-wide
+# `docs/CI.md` for the branch model and the path-filter trade-off.
 on:
   push:
     branches: [main, claude-master]
