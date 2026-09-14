@@ -87,23 +87,27 @@ jobs:
       - name: Install the Vercel CLI
         run: npm install --global vercel@${{ env.VERCEL_CLI_VERSION }}
 
-      # Every secret is read through `env`, never interpolated into a script
-      # body: `${{ }}` is substituted BEFORE the shell parses the line, so shell
-      # syntax inside a variable would execute on a runner that holds the deploy
-      # credentials.
+      # Authentication is the `VERCEL_TOKEN` environment variable, never the
+      # command-line flag: a flag lands in the runner's process listing, where
+      # any other step on that machine can read it. Vercel's CI guidance is
+      # explicit about this.
+      #
+      # Secrets reach `env` and are never interpolated into a script body:
+      # `${{ }}` is substituted BEFORE the shell parses the line, so shell syntax
+      # inside a variable would execute on a runner holding those credentials.
       - name: Pull the project settings
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: vercel pull --yes --environment=production
 
       - name: Build
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel build --prod --token="$VERCEL_TOKEN"
+        run: vercel build --prod
 
       # `vercel deploy` prints the deployment URL on stdout. Capturing it puts
       # the address on the run summary instead of leaving it buried in a log.
@@ -114,7 +118,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          url=$(vercel deploy --prebuilt --prod)
           echo "url=$url" >> "$GITHUB_OUTPUT"
           {
             echo "## Deploy"

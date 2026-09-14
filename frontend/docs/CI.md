@@ -59,6 +59,9 @@ opaquely on their side.
 
 Three details that are corrections, not preferences:
 
+- **Authentication is the `VERCEL_TOKEN` environment variable, not `--token`.** A flag lands in
+  the runner's process listing, where any other step on that machine can read it. Vercel's CI
+  guidance says so explicitly, and the first version of this workflow got it wrong.
 - **The CLI version is pinned**, not `@latest`. Vercel's guidance is explicit that a CLI updating
   itself under the pipeline turns an unrelated release into a failed deploy.
 - **The CLI is installed with `npm`, not `pnpm add --global`.** pnpm's global bin directory is not
