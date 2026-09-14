@@ -6,12 +6,20 @@ on:
   push:
     branches: [main, claude-master]
     paths:
-      - 'backend/**'
+      # Deliberately not `backend/**`: that would compile Rust to review a
+      # change to `backend/docs/`, which `quality-docs.yml` owns.
+      - 'backend/src/**'
+      - 'backend/Cargo.toml'
+      - 'backend/Cargo.lock'
       - '.github/workflows/quality-backend.yml'
   pull_request:
     branches: [main, claude-master]
     paths:
-      - 'backend/**'
+      # Deliberately not `backend/**`: that would compile Rust to review a
+      # change to `backend/docs/`, which `quality-docs.yml` owns.
+      - 'backend/src/**'
+      - 'backend/Cargo.toml'
+      - 'backend/Cargo.lock'
       - '.github/workflows/quality-backend.yml'
 
 concurrency:

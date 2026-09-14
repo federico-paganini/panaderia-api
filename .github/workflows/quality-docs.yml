@@ -1,0 +1,82 @@
+# Markdown that no stack gate owns: the repo-wide `docs/` and `backend/docs/`.
+#
+# It is deliberately NOT the backend gate's job. Installing Node and pnpm inside
+# a cargo job to read a markdown file would add a whole toolchain and half a
+# minute to every Rust run — the Rust gate should stay Rust. Nor is it the
+# frontend gate's, which is filtered to `frontend/**` and would never fire on a
+# change under `backend/`.
+#
+# `frontend/`'s own markdown is NOT checked here: `pnpm lint` already covers it
+# inside the frontend gate, so every file has exactly one owner. Checking it
+# from the repo root would fail anyway — `frontend/prettier.config.js` declares
+# `prettier-plugin-svelte`, which does not resolve from outside `frontend/`.
+#
+# See `docs/CI.md`.
+name: Quality gate (docs)
+
+on:
+  push:
+    branches: [main, claude-master]
+    # Repeated verbatim below rather than shared with a YAML anchor: GitHub
+    # Actions does not support anchors or aliases in workflow files, and a
+    # local parser resolves them happily, so the mistake only surfaces on the
+    # runner.
+    paths:
+      - 'docs/**'
+      - 'backend/docs/**'
+      - '*.md'
+      - '.prettierrc.json'
+      - '.prettierignore'
+      - '.github/workflows/quality-docs.yml'
+  pull_request:
+    branches: [main, claude-master]
+    paths:
+      - 'docs/**'
+      - 'backend/docs/**'
+      - '*.md'
+      - '.prettierrc.json'
+      - '.prettierignore'
+      - '.github/workflows/quality-docs.yml'
+
+concurrency:
+  group: quality-docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  quality:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Prettier comes from the frontend's lockfile rather than a version pinned
+      # here, so there is exactly one Prettier in the repository and Dependabot
+      # keeps it current on its own. A separately pinned copy would drift and the
+      # two would start reformatting each other's files.
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install Prettier
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      # `--no-error-on-unmatched-pattern` because `*.md` matches nothing at the
+      # root today; without it the gate fails on a pattern rather than on a file.
+      - name: Check formatting
+        run: >
+          frontend/node_modules/.bin/prettier --check
+          "docs/**/*.md" "backend/**/*.md" "*.md"
+          --no-error-on-unmatched-pattern

@@ -24,14 +24,18 @@ frontend doc.
 `main` is the default branch, which matters twice: Dependabot reads its config from there, and a
 `workflow_run` trigger only fires from there. Until a workflow reaches `main` it does nothing.
 
-## Two gates, split by path
+## Three gates, split by path
 
-| Workflow               | Runs when                          | Documented in         |
-| ---------------------- | ---------------------------------- | --------------------- |
-| `quality-frontend.yml` | anything under `frontend/` changes | `frontend/docs/CI.md` |
-| `quality-backend.yml`  | anything under `backend/` changes  | `backend/docs/CI.md`  |
+| Workflow               | Runs when                                            | Documented in         |
+| ---------------------- | ---------------------------------------------------- | --------------------- |
+| `quality-frontend.yml` | anything under `frontend/` changes                   | `frontend/docs/CI.md` |
+| `quality-backend.yml`  | `backend/src/`, `Cargo.toml` or `Cargo.lock` changes | `backend/docs/CI.md`  |
+| `quality-docs.yml`     | markdown that no stack gate owns changes             | here                  |
 
 Each also triggers on a change to its own file, so editing a gate re-runs it.
+
+The backend gate is filtered to its **code**, not to `backend/**`. The wider filter would
+compile Rust to review a change under `backend/docs/` — the waste the split exists to avoid.
 
 Both cancel a superseded **pull-request** run and never cancel a **push** run. A cancelled run
 on a deployable branch leaves that commit with no status, which reads as "not checked" rather
@@ -52,6 +56,31 @@ mark these two — replace them with a single always-running workflow that compu
 always runs, so it always reports.
 
 This is also why the deploy chains on the gate's conclusion rather than on a push to `main`.
+
+## Markdown
+
+Every markdown file has exactly one owner:
+
+- `frontend/**/*.md` → the frontend gate, via `pnpm lint`.
+- everything else → `quality-docs.yml`.
+
+Both run **the same Prettier**, the one in `frontend/pnpm-lock.yaml`. The docs gate installs the
+frontend's dependencies rather than pinning a copy of its own: two separately pinned versions
+drift, and then they reformat each other's files on alternate runs.
+
+Prettier rather than a markdown linter, for one reason — the repository already formats markdown
+with Prettier, and a second tool would mean two overlapping opinions on the same file.
+
+**Prettier resolves its configuration per file, not per working directory.** It searches upward
+from each file and the nearest config wins outright; configs do not merge. So `frontend/**` uses
+`frontend/prettier.config.js` and everything else uses the root `.prettierrc.json`. Before that
+root file existed, markdown outside `frontend/` was silently checked against Prettier's
+_defaults_ — `printWidth` 80 instead of 100 — so two conventions were already coexisting
+unnoticed.
+
+The same resolution rule is why the docs gate does not check `frontend/**`: from the repository
+root, `frontend/prettier.config.js` declares `prettier-plugin-svelte`, which does not resolve
+from outside `frontend/`.
 
 ## Dependabot
 

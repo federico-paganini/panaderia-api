@@ -1,0 +1,11 @@
+# Build output
+target
+frontend/.svelte-kit
+frontend/.vercel
+frontend/build
+frontend/playwright-report
+frontend/test-results
+
+# Lockfiles
+pnpm-lock.yaml
+Cargo.lock
