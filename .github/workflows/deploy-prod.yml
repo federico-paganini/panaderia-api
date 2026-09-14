@@ -86,22 +86,6 @@ jobs:
       - name: Install the Vercel CLI
         run: npm install --global vercel@${{ env.VERCEL_CLI_VERSION }}
 
-      # `vercel link` writes this file locally and it is gitignored, so the
-      # runner has no copy. Without it the CLI infers the project from the
-      # environment and, on that path, resolves the authenticated USER — which
-      # a project-scoped token cannot do. Writing the two ids it would have
-      # contained keeps the narrow token working without `vercel pull`.
-      #
-      # Written with printf from env, never interpolated into the script body:
-      # `${{ }}` is substituted before the shell parses the line.
-      - name: Link the project without pulling
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          mkdir -p .vercel
-          printf '{"projectId":"%s","orgId":"%s"}\n' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
-
       # Authentication is the `VERCEL_TOKEN` environment variable, never the
       # command-line flag: a flag lands in the runner's process listing, where
       # any other step on that machine can read it.
