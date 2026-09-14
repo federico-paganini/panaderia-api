@@ -120,22 +120,49 @@ The gate itself reads no secret, and declares `permissions: contents: read` with
 
 ### Pointing lasdeliciaslp.com at it — GoDaddy
 
-Add both `lasdeliciaslp.com` and `www.lasdeliciaslp.com` in the Vercel project's Domains tab.
-Vercel then shows the exact records to create; use those values rather than any written here,
-since they change.
+Done on 2026-09-14. The domain is attached and verified on the project; what follows is the
+record of what was set and the rules for changing it.
 
-Keep DNS at GoDaddy and add only those records. **Do not move the nameservers to Vercel** — and
-this is not a preference:
+`vercel domains verify <domain>` prints the records Vercel wants, which is where these came
+from. Re-read them from there before reconfiguring rather than trusting this table — it is a
+record of what was set, not a specification.
 
-> The privacy policy publishes a contact address on this same domain, and e-mail needs MX
-> records. Nameservers at GoDaddy means the mail alias is configured where it already lives.
-> Moving them to Vercel moves the whole zone, and the MX records have to be recreated there or
-> mail silently stops arriving — at the address the legal page tells people to write to.
+| Type    | Name  | Value                                  |
+| ------- | ----- | -------------------------------------- |
+| `A`     | `@`   | `216.198.79.1`                         |
+| `A`     | `@`   | `64.29.17.1`                           |
+| `CNAME` | `www` | `e2a0bdd63786450c.vercel-dns-017.com.` |
 
-GoDaddy's own friction: it has no ALIAS/ANAME at the apex, so the apex uses the plain `A` record
-Vercel gives. Its parked defaults (an `A` on `@` pointing at GoDaddy's parking page, and a
-`CNAME` on `www`) have to be removed first, or the new records sit alongside them and resolution
-is a coin toss.
+Both `A` records, not one: they are Vercel's anycast addresses and having the pair is the
+failover. The `www` value is specific to this project, not a generic Vercel hostname.
+
+GoDaddy's parked defaults — an `A` on `@` pointing at its parking page (`13.248.243.5`,
+`76.223.105.230`) and a `CNAME` on `www` — have to be **deleted first**. Left in place they sit
+alongside the new ones and resolution becomes a coin toss: neither broken nor working, which is
+the hardest kind of failure to read. GoDaddy also has no ALIAS/ANAME at the apex, so the apex
+must use plain `A` records.
+
+**TTL: 3600, matching the zone's other records.** These values essentially never change, so a
+short TTL only buys extra lookups. The discipline that matters is the order:
+
+> Lower the TTL **before** a planned change, never after discovering you need one. Drop to 600,
+> wait out the old TTL, then change the records. Raising first and needing an urgent change
+> afterwards leaves up to an hour where some resolvers answer with the old address and some with
+> the new — not broken, not working, both at once.
+
+**Do not move the nameservers to Vercel.** The zone holds no `MX` records today (checked
+2026-09-14 — none, and no `TXT` either), so nothing would be lost this minute. The reason is
+prospective: the privacy policy publishes a contact address on this domain, that alias will need
+`MX` records, and they belong where the domain is administered. Moving the zone to Vercel means
+recreating them there or mail silently stops arriving — at the address the legal page tells
+people to write to.
+
+### Certificate
+
+Issued automatically once DNS resolved. Expect a few minutes of `000` and TLS handshake errors
+on individual paths while it propagates across edge nodes — `/` can succeed while `/privacy`
+still fails on the same host. That is propagation, not misconfiguration; re-check before
+changing anything.
 
 ## First run, 2026-09-13
 
