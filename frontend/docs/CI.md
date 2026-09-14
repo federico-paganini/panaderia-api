@@ -50,6 +50,25 @@ Two consequences:
 The checkout pins `github.event.workflow_run.head_sha`: a `workflow_run` job otherwise checks out
 the default branch's tip, which is not necessarily the revision that passed.
 
+### What the workflow does, and why those exact steps
+
+`vercel pull --yes --environment=production` → `vercel build --prod` →
+`vercel deploy --prebuilt --prod`. That is Vercel's own documented CI shape: `--prebuilt` splits
+the build from the ship, so the build can be cached and gated at our level rather than run
+opaquely on their side.
+
+Three details that are corrections, not preferences:
+
+- **The CLI version is pinned**, not `@latest`. Vercel's guidance is explicit that a CLI updating
+  itself under the pipeline turns an unrelated release into a failed deploy.
+- **The CLI is installed with `npm`, not `pnpm add --global`.** pnpm's global bin directory is not
+  on `PATH` until `pnpm setup` has run, which it has not on a fresh runner —
+  `ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH`, the same failure that bites locally. npm's global bin is
+  already on `PATH` via `setup-node`.
+- **There is no explicit `pnpm install`.** `vercel build` performs its own install in the project
+  directory; an extra one only pays for it twice. pnpm still has to _exist_ for that install to
+  use, which is what the `pnpm/action-setup` step is for.
+
 ### Secrets
 
 | Secret              | Where it comes from                                                             |

@@ -29,6 +29,11 @@ concurrency:
   group: deploy-prod
   cancel-in-progress: false
 
+env:
+  # Pinned, and matching the CLI verified locally. Vercel's own CI guidance is
+  # explicit that `@latest` can break a pipeline on an unrelated release.
+  VERCEL_CLI_VERSION: '59.16.0'
+
 defaults:
   run:
     working-directory: frontend
@@ -67,11 +72,20 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
+      # pnpm is set up above but deliberately NOT run here: `vercel build`
+      # performs its own install in the project directory, so an explicit
+      # `pnpm install` would only pay for it twice. pnpm still has to EXIST for
+      # that install to use it, which is what the setup step above is for.
+      #
+      # The CLI goes in through npm rather than `pnpm add --global`: pnpm's
+      # global bin directory is not on PATH unless `pnpm setup` has run, which
+      # it has not on a fresh runner — the same ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH
+      # that bites locally. npm's global bin is already on PATH via setup-node.
+      #
+      # Pinned, not `@latest`: a CLI that updates itself under the pipeline
+      # turns an unrelated release into a failed deploy.
       - name: Install the Vercel CLI
-        run: pnpm add --global vercel@latest
+        run: npm install --global vercel@${{ env.VERCEL_CLI_VERSION }}
 
       # Every secret is read through `env`, never interpolated into a script
       # body: `${{ }}` is substituted BEFORE the shell parses the line, so shell
@@ -91,9 +105,21 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
+      # `vercel deploy` prints the deployment URL on stdout. Capturing it puts
+      # the address on the run summary instead of leaving it buried in a log.
       - name: Deploy
+        id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Deploy"
+            echo
+            echo "- **URL**: $url"
+            echo "- **Target**: production"
+            echo "- **Commit**: ${GITHUB_SHA:0:7}"
+          } >> "$GITHUB_STEP_SUMMARY"
