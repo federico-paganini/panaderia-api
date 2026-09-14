@@ -52,12 +52,30 @@ the default branch's tip, which is not necessarily the revision that passed.
 
 ### What the workflow does, and why those exact steps
 
-`vercel pull --yes --environment=production` → `vercel build --prod` →
-`vercel deploy --prebuilt --prod`. That is Vercel's own documented CI shape: `--prebuilt` splits
-the build from the ship, so the build can be cached and gated at our level rather than run
-opaquely on their side.
+`pnpm install` → `pnpm build` → `vercel deploy --prebuilt --prod`. Three steps, and the two
+missing ones are the interesting part.
 
-Three details that are corrections, not preferences:
+Vercel's documented CI shape is `vercel pull` → `vercel build` → `vercel deploy --prebuilt`.
+Both of the first two are absent here, for two independent reasons that happen to agree:
+
+- **`vercel build` has nothing to do.** The SvelteKit Vercel adapter already writes the Build
+  Output API directory (`.vercel/output`) as part of `pnpm build`. Running Vercel's builder over
+  it would only rebuild what exists.
+- **`vercel pull` and `vercel build` resolve the authenticated user before doing anything**, and
+  a **project-scoped** token cannot — it reads its own project and nothing else, which is the
+  whole point of it. `deploy --prebuilt` makes no such call. Verified the hard way: with a
+  project token, `pull` fails with "Could not retrieve Project Settings", `pull --scope` fails
+  with "Not able to load user", and `deploy --prebuilt` succeeds.
+
+So the token stays scoped to `lasdelicias-web-client` instead of the account. Vercel's token
+dialog offers exactly two scopes — one project, or full account — and the account-wide one is
+not needed here.
+
+**The consequence to remember:** without `vercel pull`, environment variables configured in
+Vercel's dashboard never reach this build. There are none today. The day there are, they have to
+arrive as repository secrets in this workflow, not from Vercel.
+
+Three more details that are corrections, not preferences:
 
 - **Authentication is the `VERCEL_TOKEN` environment variable, not `--token`.** A flag lands in
   the runner's process listing, where any other step on that machine can read it. Vercel's CI
@@ -68,9 +86,6 @@ Three details that are corrections, not preferences:
   on `PATH` until `pnpm setup` has run, which it has not on a fresh runner —
   `ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH`, the same failure that bites locally. npm's global bin is
   already on `PATH` via `setup-node`.
-- **There is no explicit `pnpm install`.** `vercel build` performs its own install in the project
-  directory; an extra one only pays for it twice. pnpm still has to _exist_ for that install to
-  use, which is what the `pnpm/action-setup` step is for.
 
 ### Secrets
 

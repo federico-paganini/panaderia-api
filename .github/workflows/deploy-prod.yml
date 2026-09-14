@@ -72,44 +72,36 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      # pnpm is set up above but deliberately NOT run here: `vercel build`
-      # performs its own install in the project directory, so an explicit
-      # `pnpm install` would only pay for it twice. pnpm still has to EXIST for
-      # that install to use it, which is what the setup step above is for.
-      #
-      # The CLI goes in through npm rather than `pnpm add --global`: pnpm's
-      # global bin directory is not on PATH unless `pnpm setup` has run, which
-      # it has not on a fresh runner — the same ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH
-      # that bites locally. npm's global bin is already on PATH via setup-node.
-      #
+      - name: Build
+        # `pnpm build` is the whole build: the SvelteKit Vercel adapter writes
+        # the Build Output API directory (`.vercel/output`) itself, so
+        # `vercel build` has nothing left to do. Skipping it is not only leaner
+        # — it is what keeps the deploy token scoped to this one project.
+        run: pnpm install --frozen-lockfile && pnpm build
+
       # Pinned, not `@latest`: a CLI that updates itself under the pipeline
-      # turns an unrelated release into a failed deploy.
+      # turns an unrelated release into a failed deploy. Installed through npm
+      # rather than `pnpm add --global`, whose bin directory is not on PATH
+      # until `pnpm setup` has run — which it has not on a fresh runner.
       - name: Install the Vercel CLI
         run: npm install --global vercel@${{ env.VERCEL_CLI_VERSION }}
 
       # Authentication is the `VERCEL_TOKEN` environment variable, never the
       # command-line flag: a flag lands in the runner's process listing, where
-      # any other step on that machine can read it. Vercel's CI guidance is
-      # explicit about this.
+      # any other step on that machine can read it.
       #
-      # Secrets reach `env` and are never interpolated into a script body:
-      # `${{ }}` is substituted BEFORE the shell parses the line, so shell syntax
-      # inside a variable would execute on a runner holding those credentials.
-      - name: Pull the project settings
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel pull --yes --environment=production
-
-      - name: Build
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel build --prod
-
-      # `vercel deploy` prints the deployment URL on stdout. Capturing it puts
+      # `vercel pull` and `vercel build` are deliberately absent. Both resolve
+      # the authenticated USER before doing anything, which a project-scoped
+      # token cannot do — it can read its own project and nothing else, which is
+      # the entire point of it. `deploy --prebuilt` makes no such call, so the
+      # narrow token works and the account-wide one is not needed.
+      #
+      # The consequence to remember: without `vercel pull`, environment
+      # variables configured in Vercel never reach this build. There are none
+      # today. The day there are, they have to come from repository secrets
+      # here, not from Vercel's dashboard.
+      #
+      # `vercel deploy` prints the deployment URL on stdout; capturing it puts
       # the address on the run summary instead of leaving it buried in a log.
       - name: Deploy
         id: deploy
@@ -118,7 +110,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          url=$(vercel deploy --prebuilt --prod)
+          url=$(vercel deploy --prebuilt --prod --yes)
           echo "url=$url" >> "$GITHUB_OUTPUT"
           {
             echo "## Deploy"
