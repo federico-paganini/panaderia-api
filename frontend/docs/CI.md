@@ -157,6 +157,42 @@ prospective: the privacy policy publishes a contact address on this domain, that
 recreating them there or mail silently stops arriving — at the address the legal page tells
 people to write to.
 
+### Security headers, and why `vercel.json` does not work here
+
+The site sends a Content Security Policy plus `X-Frame-Options`,
+`X-Content-Type-Options`, `Referrer-Policy` and `Permissions-Policy`. HSTS is Vercel's own.
+
+They arrive by **two different mechanisms**, and the split is not arbitrary:
+
+- **The policy itself** is declared in `svelte.config.js` under `kit.csp`. Every route is
+  prerendered, so SvelteKit bakes it into each page as a `<meta http-equiv>`. `mode: 'hash'`
+  matters: the built page carries one inline script — SvelteKit's own hydration bootstrap — and
+  hashing it is what keeps `script-src` at `'self'` instead of opening `'unsafe-inline'` for
+  everything. The policy is this strict because the site genuinely loads nothing from anywhere
+  else; the fonts are self-hosted precisely so that stays true.
+- **`frame-ancestors` and the non-CSP headers** are injected into `.vercel/output/config.json`
+  by `scripts/security-headers.mjs`, which runs as part of `pnpm build`. Browsers ignore
+  `frame-ancestors` in a meta tag, and the others were never expressible there at all.
+
+**A `vercel.json` `headers` block does nothing on this project.** The deploy runs
+`vercel deploy --prebuilt`, which ships `.vercel/output` as-is; nothing compiles `vercel.json`
+into `config.json` on that path. Verified against a preview on 2026-09-14: with the file in
+place the deployment answered with no `X-Frame-Options`, no `Referrer-Policy` and no header CSP.
+The file was deleted rather than left as decoration.
+
+One consequence of the split: the two policies are enforced together, not merged. The meta one
+governs sources, the header one governs framing, and neither relaxes the other.
+
+`scripts/security-headers.spec.ts` pins the transform — that every header is present, that the
+rule sets `continue: true` (without it the rule would _answer_ every request instead of
+decorating it), and that an unrecognised Build Output API version throws rather than passing
+through and shipping a site with no headers and a green build.
+
+**CSRF is asserted, not added.** `csrf: { trustedOrigins: [] }` in `svelte.config.js` protects
+nothing today: the site is fully prerendered, with no form, no POST handler and no cookie. It is
+there so the day someone adds one, the strict posture is already the default rather than a thing
+to remember.
+
 ### Certificate — nobody runs certbot here, and why
 
 Issued automatically by **Let's Encrypt** the moment DNS resolved: 90 days of validity, renewed

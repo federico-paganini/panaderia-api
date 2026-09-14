@@ -4,6 +4,14 @@
 // Reset and base. Everything below is element-level; component styles live with
 // their components.
 
+// SvelteKit's body wrapper. A class rather than the scaffold's inline
+// `style="display: contents"`: a single style attribute would otherwise force
+// `style-src 'unsafe-inline'` into the Content Security Policy, which is a high
+// price for one declaration.
+.app-root {
+	display: contents;
+}
+
 *,
 *::before,
 *::after {
