@@ -24,6 +24,10 @@ export const SECURITY_HEADERS = {
 	'Content-Security-Policy': "frame-ancestors 'none'",
 	// Same intent, for browsers that predate frame-ancestors.
 	'X-Frame-Options': 'DENY',
+	// The conventional opt-out signal for AI training and image scraping. Like
+	// robots.txt it is a request, not a control, and it is honoured by a smaller
+	// set of crawlers — but it costs one header.
+	'X-Robots-Tag': 'noai, noimageai',
 	'X-Content-Type-Options': 'nosniff',
 	'Referrer-Policy': 'strict-origin-when-cross-origin',
 	'Permissions-Policy':

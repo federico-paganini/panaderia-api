@@ -4,6 +4,17 @@
 // Reset and base. Everything below is element-level; component styles live with
 // their components.
 
+// SvelteKit's client creates this live region after hydration — it announces
+// page changes to screen readers on client-side navigation — and hides it with
+// an inline style set from JavaScript, which `style-src 'self'` blocks. It
+// happens to stay hidden in Chrome today, but that is the browser's leniency,
+// not our design: enforced harder, a 1px announcer becomes a visible artefact
+// on every page. Hiding it from the stylesheet makes it independent of whether
+// the inline style ever applies.
+#svelte-announcer {
+	@include visually-hidden;
+}
+
 // SvelteKit's body wrapper. A class rather than the scaffold's inline
 // `style="display: contents"`: a single style attribute would otherwise force
 // `style-src 'unsafe-inline'` into the Content Security Policy, which is a high

@@ -40,7 +40,14 @@ const config = {
 			directives: {
 				'default-src': ['self'],
 				'script-src': ['self'],
-				'style-src': ['self'],
+				// `unsafe-inline` for STYLES only, and deliberately. SvelteKit's client
+				// creates its screen-reader live region after hydration and hides it with
+				// an inline style, so a strict `style-src` logs a violation on every page
+				// load — noise that trains people to ignore CSP errors and would bury a
+				// real one. What makes injected CSS dangerous is exfiltration, and those
+				// sinks are already shut by `img-src` and `connect-src` above. `script-src`
+				// stays strict with a hash, which is where the real risk lives.
+				'style-src': ['self', 'unsafe-inline'],
 				'img-src': ['self', 'data:'],
 				'font-src': ['self'],
 				'connect-src': ['self'],

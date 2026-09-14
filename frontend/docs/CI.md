@@ -188,6 +188,33 @@ rule sets `continue: true` (without it the rule would _answer_ every request ins
 decorating it), and that an unrecognised Build Output API version throws rather than passing
 through and shipping a site with no headers and a green build.
 
+**`style-src` allows `unsafe-inline`, deliberately.** SvelteKit's client creates its
+screen-reader live region after hydration and hides it with an inline style, so a strict
+`style-src` logs a CSP violation on every page load — noise that trains people to ignore CSP
+errors and would bury a real one. What makes injected CSS dangerous is exfiltration, and those
+sinks are already shut by `img-src 'self' data:` and `connect-src 'self'`. `script-src` stays
+strict with a hash, which is where the real risk lives. The announcer is also hidden from
+`app.scss` independently, so it stays hidden whatever the policy does.
+
+### Crawlers
+
+`robots.txt` denies AI training crawlers, dataset builders and scrape-resellers by name, and
+welcomes search engines — a bakery wants to be found. `X-Robots-Tag: noai, noimageai` rides
+along as the conventional opt-out signal.
+
+**Both are requests, not controls.** A crawler that ignores `robots.txt` is not stopped by
+anything here. Real enforcement would be Vercel's firewall or BotID, which is a separate
+decision with its own costs.
+
+**No Meta agent is on the denied list**, and that is the one rule worth guarding. A stricter
+policy elsewhere blocks `FacebookBot` and `Meta-ExternalAgent`; copying it here would risk the
+single thing `/privacy` exists for, which is getting the WhatsApp app through Meta's review.
+Blocking a Meta crawler to keep a bakery's opening hours out of a training set is the wrong side
+of that trade. `src/routes/robots.txt/robots.spec.ts` fails if one ever appears.
+
+Preview deployments need no special handling: Vercel adds `X-Robots-Tag: noindex` to them on its
+own, and production carries none — verified 2026-09-14.
+
 **CSRF is asserted, not added.** `csrf: { trustedOrigins: [] }` in `svelte.config.js` protects
 nothing today: the site is fully prerendered, with no form, no POST handler and no cookie. It is
 there so the day someone adds one, the strict posture is already the default rather than a thing
