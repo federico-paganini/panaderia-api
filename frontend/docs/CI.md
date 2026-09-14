@@ -157,12 +157,39 @@ prospective: the privacy policy publishes a contact address on this domain, that
 recreating them there or mail silently stops arriving — at the address the legal page tells
 people to write to.
 
-### Certificate
+### Certificate — nobody runs certbot here, and why
 
-Issued automatically once DNS resolved. Expect a few minutes of `000` and TLS handshake errors
-on individual paths while it propagates across edge nodes — `/` can succeed while `/privacy`
-still fails on the same host. That is propagation, not misconfiguration; re-check before
-changing anything.
+Issued automatically by **Let's Encrypt** the moment DNS resolved: 90 days of validity, renewed
+by Vercel at around 60. Nothing was bought, installed or configured.
+
+It is worth knowing the mechanism, because the parts that can break it are not obvious.
+
+Vercel runs an ACME client — the same protocol `certbot` speaks, just operated by someone else.
+Let's Encrypt asks it to publish a specific value at a path on the domain and then fetches that
+path over **port 80**. Control of the DNS is the proof of ownership; there is no other check.
+
+That is what the odd minute during setup was: HTTP answering `200` with `Server: Vercel` and no
+`<title>` was the challenge being served. It also explains the ordering — attempting issuance
+before the GoDaddy records changed would have sent the challenge to the parking page and failed.
+
+Expect a few minutes of `000` and TLS handshake errors on individual paths right after issuance,
+while the certificate propagates across edge nodes: `/` can succeed while `/privacy` fails on the
+same host. That is propagation, not misconfiguration. Re-check before changing anything.
+
+**Two things would break renewal, both quietly:**
+
+- **A `CAA` record that omits `letsencrypt.org`.** The zone has none today (checked 2026-09-14).
+  Adding one that forbids the issuer does not break anything immediately — the current
+  certificate keeps working. Renewals start failing, and the site goes down about two months
+  later, long after the change that caused it. It is one of the hardest self-inflicted outages to
+  trace backwards.
+- **DNS no longer resolving to Vercel.** The same thing that proved ownership is what keeps
+  proving it every renewal.
+
+**This is free here because the site is on a PaaS.** When the Rust API or the WhatsApp bot land
+on a VPS, none of it comes along: Meta's webhooks only go to HTTPS, so a real certificate is
+required there too. Reach for **Caddy** before nginx + certbot — it does ACME natively, so
+issuance and renewal need no cron job and no renewal hook. See `~/Code/panaderia-bot`.
 
 ## First run, 2026-09-13
 
