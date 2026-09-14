@@ -1,0 +1,99 @@
+# Production deploy of the site to Vercel.
+#
+# NOT `push: branches: [main]`, which is the obvious shape and the wrong one
+# here. That only orders correctly when the quality gate is a REQUIRED status
+# check, so nothing can land on main without passing — and the gates are not
+# required in this repository, because a path-filtered workflow that gets
+# skipped never reports a status (see docs/CI.md). Chaining on the gate's own
+# completion is what actually guarantees a red gate never ships.
+#
+# Consequence worth knowing: a push to main that touches only `backend/` or
+# `docs/` never runs the frontend gate, so this never fires. That is correct —
+# there is nothing new to deploy — but it means the site is not redeployed by
+# every commit. Use the manual trigger when you want one anyway.
+#
+# NOTE: this couples to the gate's exact display name. Renaming
+# "Quality gate (frontend)" silently stops every deploy.
+name: Deploy prod (Vercel)
+
+on:
+  workflow_run:
+    workflows: ['Quality gate (frontend)']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# Queued, never cancelled: concurrent merges serialise into successive
+# deploys instead of racing to overwrite each other's rollout.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  deploy:
+    # A gate run that failed still fires `completed`. Without this the workflow
+    # would deploy exactly the builds it exists to stop.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Nothing here touches the GitHub API — checkout is the only GITHUB_TOKEN
+    # consumer, and the deploy authenticates with VERCEL_TOKEN. Pinned so a
+    # later change to the repository's default permissions cannot widen it.
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # `workflow_run` checks out the default branch by default, not the
+          # commit the gate ran on. Pin it explicitly so the deploy ships the
+          # revision that was actually verified.
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.event.workflow_run.head_sha }}
+          # No authenticated git operations here; don't leave the token behind
+          # in .git/config on a runner that holds the deploy credentials.
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      # Every secret is read through `env`, never interpolated into a script
+      # body: `${{ }}` is substituted BEFORE the shell parses the line, so shell
+      # syntax inside a variable would execute on a runner that holds the deploy
+      # credentials.
+      - name: Pull the project settings
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

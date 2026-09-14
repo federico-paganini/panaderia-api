@@ -10,10 +10,9 @@ working-branch  →  claude-master  →  main
   gate (PR)         gate (push)   gate (push)
 ```
 
-No preview tier and no deploy workflow yet — the frontend deploys through Vercel's own Git
-integration, and the backend has nowhere to deploy to. When either changes, deploys go in
-their own workflow with **no quality steps inside them** (`ENGINEERING.md`): build, push, roll
-out, queued rather than cancelled so concurrent merges serialise.
+No preview tier. The site deploys to Vercel from `main` via `deploy-prod.yml`; the backend has
+nowhere to deploy to yet. The deploy workflow carries **no quality steps** (`ENGINEERING.md`):
+pull settings, build, ship — queued rather than cancelled so concurrent merges serialise.
 
 `claude-master` does not exist yet. The workflows already name it, so it works the day it is
 created.
@@ -47,11 +46,24 @@ check: it always runs, so it always reports.
 
 ## Secrets and variables
 
-None. Neither gate reads a secret, and both declare `permissions: contents: read` with
-`persist-credentials: false` on checkout — nothing here needs authenticated git, so the token
+Neither **gate** reads a secret. Both declare `permissions: contents: read` with
+`persist-credentials: false` on checkout — nothing there needs authenticated git, so the token
 is not left behind in `.git/config`.
 
-Vercel holds its own deploy credentials; they never pass through these workflows.
+The **deploy** needs three repository secrets:
+
+| Secret              | Where it comes from                                                             |
+| ------------------- | ------------------------------------------------------------------------------- |
+| `VERCEL_TOKEN`      | Vercel → Account Settings → Tokens. Scope it to the team that owns the project. |
+| `VERCEL_ORG_ID`     | `frontend/.vercel/project.json` after running `vercel link` once, locally.      |
+| `VERCEL_PROJECT_ID` | same file.                                                                      |
+
+`.vercel/` is gitignored, so `project.json` never reaches the repository — only the two ids it
+contains, as secrets.
+
+Every one of them is read through `env`, never interpolated into a script body. `${{ }}` is
+substituted **before** the shell parses the line, so shell syntax inside a variable would
+execute on a runner that is holding the deploy credentials.
 
 ## Dependabot
 
@@ -74,6 +86,59 @@ Two things that bite:
 
 The directories line up with the gates' `paths` filters, so a Dependabot PR runs exactly the
 gate it concerns and no other.
+
+## Deploying
+
+`deploy-prod.yml`. It chains on the frontend gate's completion (`workflow_run`) rather than on
+`push: branches: [main]`, which is the obvious shape and the wrong one here.
+
+`push` only orders correctly when the gate is a **required status check**, so nothing can reach
+`main` without passing. These gates are not required — a path-filtered workflow that gets
+skipped never reports a status — so a plain `push` trigger would deploy a red build. Chaining
+on the gate's own conclusion is what actually guarantees it cannot.
+
+Two consequences:
+
+- A push to `main` touching only `backend/` or `docs/` never runs the frontend gate, so it
+  never deploys. That is right: nothing changed in the site. `workflow_dispatch` is there for
+  when you want a deploy anyway.
+- The workflow couples to the gate's exact display name. **Renaming
+  "Quality gate (frontend)" silently stops every deploy.**
+
+The checkout pins `github.event.workflow_run.head_sha`: a `workflow_run` job otherwise checks
+out the default branch's tip, which is not necessarily the commit that was verified.
+
+### Setting the Vercel project up — one time, by hand
+
+1. Create the project in Vercel from this repository.
+2. **Root Directory: `frontend`.** This is a monorepo; the default of `/` finds no app and the
+   failure is confusing.
+3. **Turn Vercel's own Git deploys off**, or the two paths race and Vercel ships builds our gate
+   never saw. Either disconnect the Git integration, or set Settings → Git → _Ignored Build
+   Step_ to a command that always skips. Mind the inverted convention there: exit code **1**
+   means _continue the build_, and any other code **cancels** it — so `exit 0` is the one that
+   skips. Confirm it in the UI rather than trusting this line.
+4. Run `vercel link` once inside `frontend/` to produce `.vercel/project.json`, and copy the two
+   ids into the repository secrets above along with a token.
+
+### Pointing lasdeliciaslp.com at it — GoDaddy
+
+Add both `lasdeliciaslp.com` and `www.lasdeliciaslp.com` in the Vercel project's Domains tab.
+Vercel then shows the exact records to create; use those values rather than any written here,
+since they change.
+
+Keep DNS at GoDaddy and add only those records. **Do not move the nameservers to Vercel** — and
+this is not a preference:
+
+> The privacy policy publishes a contact address on this same domain, and e-mail needs MX
+> records. Nameservers at GoDaddy means the mail alias is configured where it already lives.
+> Moving them to Vercel moves the whole zone, and the MX records have to be recreated there or
+> mail silently stops arriving — at the address the legal page tells people to write to.
+
+GoDaddy's own friction: it has no ALIAS/ANAME at the apex, so the apex uses the plain `A` record
+Vercel gives. Its parked defaults (an `A` on `@` pointing at GoDaddy's parking page, and a
+`CNAME` on `www`) have to be removed first, or the new records sit alongside them and resolution
+is a coin toss.
 
 ## Running the gate locally
 
