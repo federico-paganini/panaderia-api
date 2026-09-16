@@ -157,7 +157,7 @@
 	WhatsApp y por el tiempo que se conserven en esos dispositivos.
 </p>
 
-<h2>7. Tus derechos</h2>
+<h2 id="rights">7. Tus derechos</h2>
 <p>
 	La Ley N.º 18.331 de Protección de Datos Personales te reconoce los derechos de
 	<strong>acceso, rectificación, actualización, inclusión, supresión y oposición</strong> sobre tus datos.
