@@ -23,41 +23,33 @@ cargo test
 The runner's preinstalled stable toolchain is used, with only `rustfmt` and `clippy` added —
 that avoids a third-party action for two lines.
 
-## First run, 2026-09-13 — red
+## First green run, 2026-09-16
 
-On `f5c58d5`, at the audit step. Fail-fast then **skipped** format, clippy and tests, so the two
-known `main.rs` problems below were never reported. That is the gate working as designed, but it
-is worth knowing that an audit failure hides everything after it.
+The gate was red from its first run until now, and everything below is how it got closed —
+kept because the reasoning matters more than the outcome.
 
-### Open decision: RUSTSEC-2026-0235 in `rkyv` 0.7.46
+**RUSTSEC-2026-0235 in `rkyv` 0.7.46 — resolved, not silenced.** The plan of record was an
+`audit.toml` carrying an ignore, on the argument that `rust_decimal` declared `rkyv` behind a
+feature that is not enabled here, so the crate sat in `Cargo.lock` without ever reaching the
+binary. Trying the honest fix first turned out to be enough: `cargo update -p rust_decimal`
+(1.42.1 → 1.43.0) removed `rkyv` and its thirteen transitive crates from the lockfile
+altogether. The lockfile shrank by 133 lines. No security check was narrowed, and there is no
+ignore for anyone to find later and have to reconstruct.
 
-The advisory is real. Whether it reaches this binary is a different question, and the evidence
-says it does not:
+**RUSTSEC-2026-0285 in `rustls` 0.23.43 — appeared while fixing the first.** Published
+2026-09-14, two days before. Unlike the last one this crate is genuinely in the build graph
+(`sea-orm` with `runtime-tokio-rustls`). `cargo update -p rustls` to 0.23.45.
 
-- `rkyv` is declared by `rust_decimal` 1.42.1 as an **optional** dependency behind a feature.
-- That feature is not enabled here: `cargo tree --invert rkyv --target all` prints nothing,
-  meaning nothing in the build graph reaches it.
-- It is in `Cargo.lock` regardless, and `cargo audit` scans the lockfile without resolving
-  features — so it reports a crate that is never compiled into the binary.
+The lesson worth keeping: the first advisory hid the second. Fail-fast means the audit stops at
+the first finding, so a clean run is the only evidence that there is exactly one problem.
 
-**This needs a decision, and it is not one to take quietly.** Silencing it means an `audit.toml`
-carrying `ignore = ["RUSTSEC-2026-0235"]`, which narrows a security check; the alternative is to
-leave the gate red until `rust_decimal` bumps its optional dependency. Either way the reasoning
-belongs here, with a date, so the next person does not find a bare ignore and have to guess.
+**`src/main.rs`** — `#[tokio::main]` sat on a synchronous `fn main()`. The macro rewrites an
+`async fn main` into a sync one that builds the runtime and blocks on the returned future; with
+no `async` there is no future to drive, so it rejected the declaration. Now `async fn main`, and
+the file ends in a newline, which `cargo fmt --check` wanted separately.
 
-### Still open on `main.rs`, behind the audit failure
-
-Both will surface once the audit step is resolved:
-
-- `cargo fmt --check` — no trailing newline.
-- `cargo clippy` — `#[tokio::main]` sits on a synchronous `fn main()`. The macro rewrites an
-  `async fn main` into a sync one that builds the runtime and blocks on the returned future;
-  with no `async` there is no future to drive, so it rejects the declaration.
-
-### Pending confirmation
-
-Federico will confirm this gate's first green run **when his Fable usage resets**. Until then it
-has never been seen green end to end, and nothing here should be described as verified.
+All four steps verified locally before the push: audit, fmt, clippy with `-D warnings`, and
+tests, each checked on its own exit code rather than through a pipe.
 
 ## Traps paid for
 

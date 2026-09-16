@@ -8,7 +8,7 @@ Two things live here, deliberately in one repository and deliberately independen
 |                          | What                                          | State                                                      |
 | ------------------------ | --------------------------------------------- | ---------------------------------------------------------- |
 | [`frontend/`](frontend/) | The bakery's public site, SvelteKit on Vercel | **Live** at [lasdeliciaslp.com](https://lasdeliciaslp.com) |
-| [`backend/`](backend/)   | The bakery API, Rust with Axum and SeaORM     | Skeleton; does not compile yet                             |
+| [`backend/`](backend/)   | The bakery API, Rust with Axum and SeaORM     | Skeleton; compiles and passes its gate, does nothing yet   |
 
 A third piece is a separate repository: [`panaderia-bot`](https://github.com/federico-paganini/panaderia-bot),
 the WhatsApp assistant for the party venue. It is coupled to this one in exactly one place —
