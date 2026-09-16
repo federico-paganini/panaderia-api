@@ -333,28 +333,28 @@ At ≤ 768 px: headline 48 / accent 40; keep two stickers, shrink them; flatten 
 cards stack; nav collapses to logo chip + the WhatsApp CTA. Gutter never below 16 px. The
 body must never scroll horizontally.
 
-## 11. Inputs — state on 2026-09-14
+## 11. Inputs — state on 2026-09-16
 
 Still missing:
 
-| Input                                                                                   | Needed for                                                                                                                                                                                                                        |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Photos: shopfront, counter/vitrina, products (landscape for the hero, square for cards) | Everything — the aesthetic is 70% photography; also the dark palette for the landing's own surfaces (§4), which cannot be decided against nothing                                                                                 |
-| WhatsApp number                                                                         | The hero CTA link, which currently points nowhere                                                                                                                                                                                 |
-| A contact e-mail alias on the domain                                                    | **The last thing between the WhatsApp bot and production.** `/privacy` is live and correct, but it publishes that address as the channel for exercising rights under Ley 18.331 and the zone has no `MX` records, so mail bounces |
-| `Las Delicias` as SVG outlines                                                          | The logo's wordmark, provisional in Great Vibes meanwhile. Needs a Windows machine with Edwardian Script ITC; brief at `handoff-wordmark-outlines.md`                                                                             |
+| Input                                                                                   | Needed for                                                                                                                                            |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Photos: shopfront, counter/vitrina, products (landscape for the hero, square for cards) | Everything — the aesthetic is 70% photography; also the dark palette for the landing's own surfaces (§4), which cannot be decided against nothing     |
+| WhatsApp number                                                                         | The hero CTA link, which currently points nowhere                                                                                                     |
+| `Las Delicias` as SVG outlines                                                          | The logo's wordmark, provisional in Great Vibes meanwhile. Needs a Windows machine with Edwardian Script ITC; brief at `handoff-wordmark-outlines.md` |
 
 Resolved:
 
-| Input                    | Answer                                                                                                                                               |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Domain                   | `lasdeliciaslp.com`, live on Vercel since 2026-09-14 with an automatic Let's Encrypt certificate                                                     |
-| Hosting and deploy       | Vercel, deployed by CI on every push to `main` that passes the frontend gate                                                                         |
-| Legal entity and RUT     | GERALNA LTDA., RUT `080097130018` (check digit verified) — `src/lib/legal/entity.ts`                                                                 |
-| Privacy policy and terms | Written and **published** at `/privacy` and `/terms`                                                                                                 |
-| Retention period         | 30 days. Published, so it now constrains the bot's storage decision                                                                                  |
-| Opening hours            | Mon–Sat, 7:30–21:00 in person and 8:00–20:00 by phone — kept as two ranges in `$lib/site`, because flattening them misleads whoever arrives at 20:30 |
-| Logo typeface            | Edwardian Script ITC (§3)                                                                                                                            |
+| Input                    | Answer                                                                                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Domain                   | `lasdeliciaslp.com`, live on Vercel since 2026-09-14 with an automatic Let's Encrypt certificate                                                                                 |
+| Hosting and deploy       | Vercel, deployed by CI on every push to `main` that passes the frontend gate                                                                                                     |
+| Legal entity and RUT     | GERALNA LTDA., RUT `080097130018` (check digit verified) — `src/lib/legal/entity.ts`                                                                                             |
+| Privacy policy and terms | Written and **published** at `/privacy` and `/terms`                                                                                                                             |
+| Retention period         | 30 days. Published, so it now constrains the bot's storage decision                                                                                                              |
+| Opening hours            | Mon–Sat, 7:30–21:00 in person and 8:00–20:00 by phone — kept as two ranges in `$lib/site`, because flattening them misleads whoever arrives at 20:30                             |
+| Logo typeface            | Edwardian Script ITC (§3)                                                                                                                                                        |
+| Contact e-mail alias     | `privacidad@lasdeliciaslp.com`, live since 2026-09-16 via forwardemail.net. `/privacy` publishes it as the Ley 18.331 channel, so the domain's `MX` records are now load-bearing |
 
 ## 12. Implementation notes (Svelte) — as built
 

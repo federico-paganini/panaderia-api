@@ -150,12 +150,12 @@ short TTL only buys extra lookups. The discipline that matters is the order:
 > afterwards leaves up to an hour where some resolvers answer with the old address and some with
 > the new — not broken, not working, both at once.
 
-**Do not move the nameservers to Vercel.** The zone holds no `MX` records today (checked
-2026-09-14 — none, and no `TXT` either), so nothing would be lost this minute. The reason is
-prospective: the privacy policy publishes a contact address on this domain, that alias will need
-`MX` records, and they belong where the domain is administered. Moving the zone to Vercel means
-recreating them there or mail silently stops arriving — at the address the legal page tells
-people to write to.
+**Do not move the nameservers to Vercel.** The zone now carries `MX` records pointing at
+forwardemail.net (added 2026-09-16), which is what makes `privacidad@lasdeliciaslp.com` — the
+address `/privacy` publishes as the channel for exercising rights under Ley 18.331 — actually
+receive mail. Moving the zone to Vercel moves those records with it, and recreating them is a
+step that is easy to forget precisely because nothing visibly breaks: mail simply stops
+arriving, at the address a published legal document tells people to write to.
 
 ### Security headers, and why `vercel.json` does not work here
 

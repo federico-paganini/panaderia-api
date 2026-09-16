@@ -18,10 +18,10 @@ export const LEGAL_ENTITY = {
 	country: 'Uruguay',
 	phone: '+598 2364 1201',
 
-	// PENDING — must be a real, monitored mailbox or alias before the privacy
-	// policy is published, because it is the channel data subjects use to
-	// exercise their rights under Uruguay's Ley 18.331. Proposed alias,
-	// awaiting Federico's confirmation and the actual forwarding rule on the
-	// lasdeliciaslp.com domain.
+	// Live since 2026-09-16, forwarded through forwardemail.net (the domain's MX
+	// records point there). This is the channel data subjects use to exercise
+	// their rights under Uruguay's Ley 18.331, and `/privacy` publishes it — so
+	// it has to keep receiving. Changing it means changing a published legal
+	// document, not just a constant.
 	contactEmail: 'privacidad@lasdeliciaslp.com'
 } as const;
