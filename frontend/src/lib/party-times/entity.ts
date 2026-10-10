@@ -1,4 +1,4 @@
-import type { LegalEntity } from '$lib/shared/legal';
+import type { LegalEntity } from '#lib/shared/legal.js';
 
 /**
  * The party venue, Las Delicias – Party Times: a separate company with the

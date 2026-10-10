@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALLOWED_CRAWLERS, DENIED_CRAWLERS } from '$lib/crawlers';
+import { ALLOWED_CRAWLERS, DENIED_CRAWLERS } from '#lib/crawlers.js';
 import { GET } from './+server';
 
 async function body() {

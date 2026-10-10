@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { absoluteUrl } from '$lib/site';
+	import { page } from '$app/state';
+	import { absoluteUrl } from '#lib/site.js';
 	import { currentBrand } from './brand';
 
 	interface Props {
@@ -16,12 +17,14 @@
 
 	const brand = currentBrand();
 
-	// The canonical always points at the production domain (see `$lib/site`), so
+	// The canonical always points at the production domain (see `#lib/site.js`), so
 	// a preview never competes with the real page in an index.
 	const canonical = $derived(absoluteUrl(path));
 	// A brand's landing carries its own full title; every other page is
 	// suffixed with the brand it belongs to.
-	const fullTitle = $derived(path === brand.home ? title : `${title} — ${brand.titleSuffix}`);
+	const fullTitle = $derived(
+		page.route.id === brand.home ? title : `${title} — ${brand.titleSuffix}`
+	);
 </script>
 
 <svelte:head>

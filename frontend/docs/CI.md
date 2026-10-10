@@ -164,7 +164,8 @@ The site sends a Content Security Policy plus `X-Frame-Options`,
 
 They arrive by **two different mechanisms**, and the split is not arbitrary:
 
-- **The policy itself** is declared in `svelte.config.js` under `kit.csp`. Every route is
+- **The policy itself** is declared in `vite.config.ts`, in the `csp` option of the `sveltekit()`
+  plugin (SvelteKit 3; it was `svelte.config.js` under `kit.csp` before). Every route is
   prerendered, so SvelteKit bakes it into each page as a `<meta http-equiv>`. `mode: 'hash'`
   matters: the built page carries one inline script — SvelteKit's own hydration bootstrap — and
   hashing it is what keeps `script-src` at `'self'` instead of opening `'unsafe-inline'` for
@@ -215,7 +216,7 @@ of that trade. `src/routes/robots.txt/robots.spec.ts` fails if one ever appears.
 Preview deployments need no special handling: Vercel adds `X-Robots-Tag: noindex` to them on its
 own, and production carries none — verified 2026-09-14.
 
-**CSRF is asserted, not added.** `csrf: { trustedOrigins: [] }` in `svelte.config.js` protects
+**CSRF is asserted, not added.** `csrf: { trustedOrigins: [] }` in `vite.config.ts` protects
 nothing today: the site is fully prerendered, with no form, no POST handler and no cookie. It is
 there so the day someone adds one, the strict posture is already the default rather than a thing
 to remember.

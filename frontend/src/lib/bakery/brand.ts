@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/shared/brand';
+import type { Brand } from '#lib/shared/brand.js';
 import { BAKERY_ENTITY } from './entity';
 import logo from './logo-las-delicias.svg';
 
@@ -36,7 +36,7 @@ export const BAKERY: Brand = {
 	name: 'Panadería y Confitería Las Delicias',
 	shortName: 'Las Delicias',
 	titleSuffix: 'Las Delicias',
-	home: '/',
+	home: '/(bakery)',
 	entity: BAKERY_ENTITY,
 	contact: {
 		phone: BAKERY_ENTITY.phone,

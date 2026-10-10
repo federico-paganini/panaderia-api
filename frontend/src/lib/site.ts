@@ -1,7 +1,7 @@
 /**
  * Site identity: what is true of the whole site whichever business a page
  * belongs to. Facts about one business live in its brand module —
- * `$lib/bakery/brand` and `$lib/party-times/brand`.
+ * `#lib/bakery/brand.js` and `#lib/party-times/brand.js`.
  *
  * `url` is a committed constant rather than an env var on purpose. It is public
  * by definition — every page prints it in its canonical link — and it must NOT

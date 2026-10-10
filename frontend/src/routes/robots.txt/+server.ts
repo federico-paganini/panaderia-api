@@ -1,5 +1,5 @@
-import { ALLOWED_CRAWLERS, DENIED_CRAWLERS } from '$lib/crawlers';
-import { absoluteUrl } from '$lib/site';
+import { ALLOWED_CRAWLERS, DENIED_CRAWLERS } from '#lib/crawlers.js';
+import { absoluteUrl } from '#lib/site.js';
 
 export const prerender = true;
 

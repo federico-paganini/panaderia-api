@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { PARTY_TIMES } from '$lib/party-times/brand';
-	import { isPending } from '$lib/shared/legal';
-	import SeoHead from '$lib/shared/SeoHead.svelte';
+	import { PARTY_TIMES } from '#lib/party-times/brand.js';
+	import { isPending } from '#lib/shared/legal.js';
+	import SeoHead from '#lib/shared/SeoHead.svelte';
 
 	const { entity } = PARTY_TIMES;
 </script>
 
 <!-- SKELETON. The section list mirrors the bakery's policy; the bodies wait
-     for two things: the venue's legal facts (`$lib/party-times/entity`), and whether
+     for two things: the venue's legal facts (`#lib/party-times/entity.js`), and whether
      the WhatsApp assistant keeps answering the venue's queries on the bakery's
      number or moves to a number of the venue's own — which decides whose
      processing sections 3 to 5 describe. Nothing here is invented. -->

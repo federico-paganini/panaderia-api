@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { BAKERY, HOURS } from '$lib/bakery/brand';
-	import { SITE } from '$lib/site';
-	import MailLink from '$lib/shared/MailLink.svelte';
-	import PhoneLink from '$lib/shared/PhoneLink.svelte';
-	import SeoHead from '$lib/shared/SeoHead.svelte';
+	import { BAKERY, HOURS } from '#lib/bakery/brand.js';
+	import { SITE } from '#lib/site.js';
+	import MailLink from '#lib/shared/MailLink.svelte';
+	import PhoneLink from '#lib/shared/PhoneLink.svelte';
+	import SeoHead from '#lib/shared/SeoHead.svelte';
 </script>
 
 <SeoHead
@@ -109,7 +109,7 @@
 <h2>8. Datos personales</h2>
 <p>
 	Cómo tratamos tus datos está explicado en la
-	<a href={resolve('/privacy')}>política de privacidad</a>, que forma parte de estas condiciones.
+	<a href={resolve('privacy')}>política de privacidad</a>, que forma parte de estas condiciones.
 </p>
 
 <h2>9. Cambios</h2>

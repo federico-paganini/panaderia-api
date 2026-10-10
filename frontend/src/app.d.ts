@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { Brand } from '$lib/shared/brand';
+import type { Brand } from '#lib/shared/brand.js';
 
 declare global {
 	namespace App {

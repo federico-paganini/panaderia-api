@@ -23,7 +23,7 @@ https://claude.ai/code/artifact/b43516c4-126b-4218-abcd-e688094abc9e
   owners, so it lives at `/party-times` on this domain — a route, not a subdomain, which would
   be a second site to build and deploy — with its own `/party-times/privacy` and
   `/party-times/terms` naming its own company. A skeleton exists: its legal facts are
-  bracketed placeholders in `$lib/party-times/entity`, and while any is left, `isPending` keeps its
+  bracketed placeholders in `src/lib/party-times/entity.ts`, and while any is left, `isPending` keeps its
   three pages `noindex` and the bakery's link to it hidden.
 - **Three routes from day one.** Route names are English, per the repository convention that
   everything dev-facing — identifiers, file names and routes — is English while the copy is
@@ -39,7 +39,7 @@ https://claude.ai/code/artifact/b43516c4-126b-4218-abcd-e688094abc9e
   replaces the original "static host, no server rendering". Every route is still
   `prerender = true`, so the pages are static files either way; what the adapter buys is a
   server side later, without a migration, for when the Rust API exists. Swapping the adapter
-  is one line in `svelte.config.js`.
+  is one line in `vite.config.ts`.
 - Domain: **lasdeliciaslp.com**. A Vercel preview URL also works as a public privacy-policy
   URL, so Meta's app review never had to wait for the domain.
 
@@ -420,7 +420,7 @@ Resolved:
 | Legal entity and RUT     | GERALNA LTDA., RUT `080097130018` (check digit verified) — `src/lib/bakery/entity.ts`                                                                                                                                                                                                                                                                                                                                               |
 | Privacy policy and terms | Written and **published** at `/privacy` and `/terms`                                                                                                                                                                                                                                                                                                                                                                                |
 | Retention period         | 30 days. Published, so it now constrains the bot's storage decision                                                                                                                                                                                                                                                                                                                                                                 |
-| Opening hours            | Mon–Sat, 7:30–21:00 in person and 8:00–20:00 by phone — kept as two ranges in `$lib/bakery/brand`, because flattening them misleads whoever arrives at 20:30                                                                                                                                                                                                                                                                        |
+| Opening hours            | Mon–Sat, 7:30–21:00 in person and 8:00–20:00 by phone — kept as two ranges in `src/lib/bakery/brand.ts`, because flattening them misleads whoever arrives at 20:30                                                                                                                                                                                                                                                                  |
 | Logo typeface            | Edwardian Script ITC on the sign; Pinyon Script outlines in the vector mark (§3)                                                                                                                                                                                                                                                                                                                                                    |
 | Logo as vector           | `src/lib/bakery/logo-las-delicias.svg`, with a PNG export in `docs/assets/`, re-drawn 2026-10-04 and chosen by Federico out of three candidates (§3). `Logo.svelte` serves it, and `Nav` places it on the landing                                                                                                                                                                                                                   |
 | Photos, first batch      | Nine received 2026-09-30; eight kept in `src/lib/bakery/photos/`: flautas, sweet croissants, savoury croissants (the tray that looks like medialunas), the strawberry tarts and brownies, the miga sandwiches, the canapés, the bread display and the basket. The ninth, the oven, was dropped for its quality (§6). Everything in them is sold at the counter (confirmed 2026-10-04), so none belongs to the party venue's landing |
@@ -429,13 +429,26 @@ Resolved:
 
 ## 12. Implementation notes (Svelte) — as built
 
-- **SvelteKit + `@sveltejs/adapter-vercel`**, pnpm, TypeScript strict, ESLint + Prettier,
-  Vitest + Playwright. Every route `prerender = true`.
-- **Svelte config lives in `svelte.config.js`, not inline in `vite.config.ts`.** This is not a
-  preference. `sv create` writes it inline, and `svelte-check` reads only `svelte.config.js`:
-  with the config inline it finds no preprocessor, silently **skips** every component that has
-  `<style lang="scss">` — which is all of them — and still reports zero errors. Verified by
-  mutation: a type error inside a component is invisible before the move and caught after.
+- **SvelteKit 3 + `@sveltejs/adapter-vercel` 7**, pnpm, TypeScript strict, ESLint + Prettier,
+  Vitest + Playwright. Every route `prerender = true`. Migrated from SvelteKit 2 on 2026-10-10
+  with `sv migrate sveltekit-3` plus three fixes by hand (below), verified by the gate and a
+  pixel diff of every page.
+- **The Svelte config lives in `vite.config.ts`**, passed to the `sveltekit()` plugin;
+  SvelteKit 3 dropped `svelte.config.js`. Under SvelteKit 2 this was the trap to avoid:
+  `svelte-check` read only `svelte.config.js`, and with the config inline it silently
+  **skipped** every component with `<style lang="scss">` and still reported zero errors. Under
+  SvelteKit 3 it reads the plugin's options — re-verified by mutation on 2026-10-10: a type
+  error and an undefined Sass variable planted in an SCSS component were both reported.
+- **`#lib`, not `$lib`.** Library imports are `package.json` subpath imports with the file
+  extension — `#lib/bakery/brand.js`, `#lib/shared/Nav.svelte`. Sass is unaffected: it reaches
+  the scale through `loadPaths: ['src/lib']`.
+- **`resolve()` takes a pathname without the leading `/`** (`resolve('privacy')`), or a route
+  ID, which keeps it. A brand's `home` is therefore its landing's route ID —
+  `'/(bakery)'`, `'/(party-times)/party-times'` — which both `resolve()` and `page.route.id`
+  understand; a bare `'/'` no longer resolves.
+- **The migration's formatter changed visible text once**, and only the pixel diff caught it:
+  it moved the comma after a link in both terms pages onto its own line, which renders as
+  "privacidad , que". Fixed by hand; worth a look after any automated rewrite of markup.
 - **Tokens split by what they are.** The scale (`$space-*`, `$font-size-*`, breakpoints) is
   Sass in `_tokens.scss`; colour is CSS custom properties in `_themes.scss`, which is the only
   file allowed to hold a literal colour. `_themes.scss` emits CSS, so it is included once from
@@ -448,17 +461,17 @@ Resolved:
 - **Two businesses, one app — restructured 2026-10-10.** The bakery and the party venue are
   separate companies with the same owners, published from this one site. Each has a **route
   group** — `(bakery)` with `/`, `/privacy`, `/terms`; `(party-times)` with `/party-times` and its
-  two legal pages — whose `+layout.ts` loads that business's **brand** (`$lib/bakery/brand`,
-  `$lib/party-times/brand`): names, legal entity, contact, logo, legal dates. The shared
-  components in `$lib/shared/` — `Nav`, `Logo`, `SeoHead`, `MailLink`, `PhoneLink`, `LegalFrame` —
+  two legal pages — whose `+layout.ts` loads that business's **brand** (`src/lib/bakery/brand.ts`,
+  `src/lib/party-times/brand.ts`): names, legal entity, contact, logo, legal dates. The shared
+  components in `src/lib/shared/` — `Nav`, `Logo`, `SeoHead`, `MailLink`, `PhoneLink`, `LegalFrame` —
   read it through `currentBrand()`, which throws for a page outside both groups, and a test
-  checks no page is. Code owned by one business lives in its folder (`$lib/bakery/`,
-  `$lib/party-times/`); what both use, in `$lib/shared/`; what is true of the whole site
-  (`site.ts`, `routes.ts`, `crawlers.ts`, `styles/`) stays at the root of `$lib`. Rejected: two
+  checks no page is. Code owned by one business lives in its folder (`src/lib/bakery/`,
+  `src/lib/party-times/`); what both use, in `src/lib/shared/`; what is true of the whole site
+  (`site.ts`, `routes.ts`, `crawlers.ts`, `styles/`) stays at the root of `src/lib`. Rejected: two
   apps sharing a component library — a second build, deploy, CSP, sitemap and CI for a venue that
   needs one landing and two legal pages. If the venue ever moves to its own domain, its group
   lifts out into an app whole.
-- **Legal pages share one frame**, `$lib/shared/LegalFrame.svelte`, rendered by each brand's
+- **Legal pages share one frame**, `src/lib/shared/LegalFrame.svelte`, rendered by each brand's
   `(legal)` layout: the way back to that brand's landing, the document, and a footer naming the
   company responsible. It owns all the prose typography via `:global()`; each page is content
   only.

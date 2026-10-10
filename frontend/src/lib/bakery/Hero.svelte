@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Photo from '$lib/shared/Photo.svelte';
+	import Photo from '#lib/shared/Photo.svelte';
 	import { ADDRESS, BAKERY } from './brand';
 	import bizcochos from './photos/croissants-savoury.jpg?enhanced';
 	import pan from './photos/flautas.jpg?enhanced';

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { BAKERY } from '$lib/bakery/brand';
-	import { PARTY_TIMES } from '$lib/party-times/brand';
-	import { isPending } from '$lib/shared/legal';
-	import SeoHead from '$lib/shared/SeoHead.svelte';
+	import { BAKERY } from '#lib/bakery/brand.js';
+	import { PARTY_TIMES } from '#lib/party-times/brand.js';
+	import { isPending } from '#lib/shared/legal.js';
+	import SeoHead from '#lib/shared/SeoHead.svelte';
 </script>
 
 <!-- SKELETON. The venue's own landing (spec §1): titles only until its facts,
@@ -19,7 +19,7 @@
 
 <main>
 	<p class="sister">
-		Del mismo equipo que <a href={resolve('/')}>{BAKERY.name}</a>
+		Del mismo equipo que <a href={resolve(BAKERY.home)}>{BAKERY.name}</a>
 	</p>
 
 	<h1>{PARTY_TIMES.name}</h1>
@@ -29,8 +29,8 @@
 </main>
 
 <nav aria-label="Legal">
-	<a href={resolve('/party-times/privacy')}>Política de privacidad</a>
-	<a href={resolve('/party-times/terms')}>Términos y condiciones</a>
+	<a href={resolve('party-times/privacy')}>Política de privacidad</a>
+	<a href={resolve('party-times/terms')}>Términos y condiciones</a>
 </nav>
 
 <style lang="scss">

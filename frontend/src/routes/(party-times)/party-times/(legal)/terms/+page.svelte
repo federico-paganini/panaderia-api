@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { PARTY_TIMES } from '$lib/party-times/brand';
-	import { isPending } from '$lib/shared/legal';
-	import SeoHead from '$lib/shared/SeoHead.svelte';
+	import { PARTY_TIMES } from '#lib/party-times/brand.js';
+	import { isPending } from '#lib/shared/legal.js';
+	import SeoHead from '#lib/shared/SeoHead.svelte';
 
 	const { entity } = PARTY_TIMES;
 </script>
@@ -42,7 +42,7 @@
 <h2>5. Datos personales</h2>
 <p>
 	Cómo tratamos tus datos está explicado en la
-	<a href={resolve('/party-times/privacy')}>política de privacidad</a>, que forma parte de estas
+	<a href={resolve('party-times/privacy')}>política de privacidad</a>, que forma parte de estas
 	condiciones.
 </p>
 

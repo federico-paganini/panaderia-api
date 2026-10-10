@@ -14,8 +14,12 @@ export interface Brand {
 	readonly shortName: string;
 	/** What follows a page title: "Política de privacidad — {titleSuffix}". */
 	readonly titleSuffix: string;
-	/** The brand's landing. */
-	readonly home: '/' | '/party-times';
+	/**
+	 * The brand's landing, as a route ID — what `resolve()` takes for a link
+	 * and what `page.route.id` reads on that page. Since SvelteKit 3 only route
+	 * IDs start with `/`; a bare `/` is no longer something `resolve()` accepts.
+	 */
+	readonly home: '/(bakery)' | '/(party-times)/party-times';
 	readonly entity: LegalEntity;
 	readonly contact: {
 		readonly phone: string;

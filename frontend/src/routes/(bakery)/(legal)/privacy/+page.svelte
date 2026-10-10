@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { ADDRESS, BAKERY, RETENTION_DAYS } from '$lib/bakery/brand';
-	import MailLink from '$lib/shared/MailLink.svelte';
-	import PhoneLink from '$lib/shared/PhoneLink.svelte';
-	import SeoHead from '$lib/shared/SeoHead.svelte';
+	import { ADDRESS, BAKERY, RETENTION_DAYS } from '#lib/bakery/brand.js';
+	import MailLink from '#lib/shared/MailLink.svelte';
+	import PhoneLink from '#lib/shared/PhoneLink.svelte';
+	import SeoHead from '#lib/shared/SeoHead.svelte';
 </script>
 
 <SeoHead
@@ -202,7 +202,8 @@
 		<PhoneLink />
 	</p>
 	<p>
-		Ver también los <a href={resolve('/terms')}>términos y condiciones</a> de
-		{BAKERY.shortName}.
+		Ver también los
+		<a href={resolve('terms')}>términos y condiciones</a>
+		de {BAKERY.shortName}.
 	</p>
 </div>

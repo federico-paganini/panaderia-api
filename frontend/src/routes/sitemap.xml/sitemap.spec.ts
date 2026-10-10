@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { PUBLIC_ROUTES } from '$lib/routes';
-import { SITE } from '$lib/site';
+import { PUBLIC_ROUTES } from '#lib/routes.js';
+import { SITE } from '#lib/site.js';
 import { GET } from './+server';
 
 /**

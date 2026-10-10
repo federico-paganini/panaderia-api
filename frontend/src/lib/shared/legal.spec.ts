@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { BAKERY_ENTITY } from '$lib/bakery/entity';
-import { PARTY_TIMES_ENTITY } from '$lib/party-times/entity';
-import { SITE } from '$lib/site';
+import { BAKERY_ENTITY } from '#lib/bakery/entity.js';
+import { PARTY_TIMES_ENTITY } from '#lib/party-times/entity.js';
+import { SITE } from '#lib/site.js';
 import { isPending, isPlaceholder, type LegalEntity } from './legal';
 
 /** DGI's RUT: twelve digits, the last a mod-11 check over the first eleven. */

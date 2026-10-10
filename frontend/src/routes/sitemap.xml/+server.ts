@@ -1,5 +1,5 @@
-import { PUBLIC_ROUTES } from '$lib/routes';
-import { absoluteUrl } from '$lib/site';
+import { PUBLIC_ROUTES } from '#lib/routes.js';
+import { absoluteUrl } from '#lib/site.js';
 
 export const prerender = true;
 

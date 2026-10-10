@@ -9,7 +9,7 @@
  * 2026-09-14, which answered with no `X-Frame-Options`, no `Referrer-Policy`
  * and no header CSP.
  *
- * The rest of the Content Security Policy lives in `svelte.config.js` and is
+ * The rest of the Content Security Policy lives in `vite.config.ts` and is
  * emitted as a `<meta http-equiv>` in each prerendered page. Only
  * `frame-ancestors` is repeated here, because browsers ignore that directive
  * in a meta tag. The two policies do not conflict: a browser enforces both,

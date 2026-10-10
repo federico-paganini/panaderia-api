@@ -47,9 +47,13 @@ render whichever brand the page belongs to (spec §12).
   `src/lib/styles/_themes.scss`, which is the only file allowed to hold one. A test enforces it,
   in style blocks _and_ in SVG paint attributes. That discipline is what makes the dark theme
   cheap, and dropping it is what would make a third theme expensive.
-- **Svelte config lives in `svelte.config.js`, not inline in `vite.config.ts`.** `svelte-check`
-  reads only that file; with the config inline it silently skips every component carrying
-  `<style lang="scss">` and still reports zero errors.
+- **SvelteKit 3: the whole Svelte config is in `vite.config.ts`**, passed to the `sveltekit()`
+  plugin; there is no `svelte.config.js`. `svelte-check` reads it from there — checked by
+  mutation, since under SvelteKit 2 an inline config made it skip every SCSS component in
+  silence.
+- **Library imports use `#lib/…` with the file extension** (`#lib/bakery/brand.js`), a
+  `package.json` subpath import; `$lib` is gone in SvelteKit 3. Sass still reaches the design
+  scale with `@use 'styles' as *`, through its own `loadPaths`.
 - **Photos are shown only through `src/lib/shared/Photo.svelte`**, never with `<enhanced:img>` in a
   component that has SCSS — the plugin parses the file before Sass does, and the build fails
   with an error that points nowhere near the cause. The spec's §12 has the detail.

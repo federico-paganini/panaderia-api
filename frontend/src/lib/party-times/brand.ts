@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/shared/brand';
+import type { Brand } from '#lib/shared/brand.js';
 import { PARTY_TIMES_ENTITY } from './entity';
 import logo from './logo-party-times.svg';
 
@@ -11,7 +11,7 @@ export const PARTY_TIMES: Brand = {
 	name: 'Las Delicias – Party Times',
 	shortName: 'Party Times',
 	titleSuffix: 'Las Delicias – Party Times',
-	home: '/party-times',
+	home: '/(party-times)/party-times',
 	entity: PARTY_TIMES_ENTITY,
 	contact: {
 		phone: PARTY_TIMES_ENTITY.phone,

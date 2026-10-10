@@ -1,4 +1,4 @@
-import type { LegalEntity } from '$lib/shared/legal';
+import type { LegalEntity } from '#lib/shared/legal.js';
 
 /**
  * The legal entity behind the bakery and the WhatsApp bot, as registered with
