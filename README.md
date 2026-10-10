@@ -32,9 +32,8 @@ cd backend && cargo run
 Each stack documents itself; only what is true of the whole repository sits at the root.
 
 - [`docs/CI.md`](docs/CI.md) — branch model, why the gates are split by path, Dependabot.
-- [`frontend/docs/`](frontend/docs/) — the [design spec](frontend/docs/landing-design-spec.md),
-  the [CI and deploy runbook](frontend/docs/CI.md), and the
-  [wordmark handoff](frontend/docs/handoff-wordmark-outlines.md).
+- [`frontend/docs/`](frontend/docs/) — the [design spec](frontend/docs/landing-design-spec.md)
+  and the [CI and deploy runbook](frontend/docs/CI.md).
 - [`backend/docs/CI.md`](backend/docs/CI.md) — the Rust gate and its open items.
 
 That split is a rule, not an accident: an agent or a person working on the API should not have

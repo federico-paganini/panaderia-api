@@ -2,7 +2,7 @@
 	import { buildEar } from './wheat-ear';
 
 	interface Props {
-		/** `gold` fills the grains for the logo; `ink` strokes them for the icon set. */
+		/** `gold` fills the grains (the stickers); `ink` strokes them for the icon set. */
 		mode?: 'gold' | 'ink';
 		/**
 		 * Hand-drawn wobble, in the ear's own units. The displacement scales with
@@ -27,9 +27,15 @@
 	distinction is the whole reason this component exists: a nested `<svg>`
 	establishes a new viewport and remaps its contents through its own viewBox,
 	so a transform applied to it moves the BOX and leaves the drawing's
-	coordinates untouched. Embedding the mark's ears that way put them outside
-	the oval. `<WheatEar>` supplies the frame when one is wanted; the logo
-	places this directly in its own coordinate system.
+	coordinates untouched. Embedding the old logo's ears that way put them
+	outside the oval. `<WheatEar>` supplies the frame when one is wanted;
+	inside another `<svg>`, place this with your own transform.
+
+	When you do, anchor the transform on the point that must stay put. SVG
+	applies a transform list right to left, so `rotate(a 0 150) scale(s)` scales
+	first and then reads the rotation centre in the unscaled frame — the pivot
+	moves on its own, and it once flung an ear clean out of the logo. Write it
+	as translate-to-target, rotate, scale, translate-anchor-to-origin instead.
 -->
 <g class="ear {mode}">
 	{#if rough}

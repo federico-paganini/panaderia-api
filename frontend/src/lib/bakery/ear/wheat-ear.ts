@@ -2,9 +2,10 @@
  * The wheat ear, as geometry only — no colour, no stroke widths, no filter.
  * Those belong to whatever paints it.
  *
- * One drawing serves two roles (spec §7): filled in gold it is the logo's ear,
- * stroked in ink it is the motif on every icon. Drawing them separately would
- * give the brand two hands, so the difference is paint, never shape.
+ * One drawing serves two roles (spec §7): filled in gold it is the stickers'
+ * ear, stroked in ink it is the motif on every icon, so the difference is
+ * paint, never shape. The logo is the exception: its ears are drawn in its
+ * own SVG, because this geometry could not match the sign's braided heads.
  *
  * The numbers below were chosen by Federico on the prototype, 2026-09-13.
  */
