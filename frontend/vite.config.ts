@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { enhancedImages } from '@sveltejs/enhanced-img';
 
 export default defineConfig({
 	css: {
@@ -14,7 +15,11 @@ export default defineConfig({
 	},
 	// Svelte and SvelteKit options live in `svelte.config.js` — svelte-check
 	// reads only that file. See the docblock there.
-	plugins: [sveltekit()],
+	//
+	// `enhancedImages()` turns `<enhanced:img>` into a `<picture>` with AVIF and
+	// WebP at several widths, and writes `width`/`height` so nothing shifts on
+	// load. It must come before `sveltekit()`: it preprocesses the components.
+	plugins: [enhancedImages(), sveltekit()],
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

@@ -42,7 +42,9 @@
 	--color-border: #e0d3b8;
 	--color-border-strong: #cdbb99;
 	--color-shadow: rgb(20 15 10 / 30%); // spec §6: the paper sticker's shadow
-	--color-overlay: rgb(20 15 10 / 45%); // hero photo legibility gradient
+	--color-overlay: rgb(
+		20 15 10 / 45%
+	); // legibility gradient over a full-width photo — unused since the hero went split (spec §6); kept for a later section
 }
 
 // --- Dark ------------------------------------------------------------------
