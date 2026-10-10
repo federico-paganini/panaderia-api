@@ -1,14 +1,19 @@
 <script lang="ts">
+	// The frame of every legal page, whichever business publishes it: a way back
+	// to that business's landing, the document, and a footer naming the company
+	// responsible for it. Each brand's `(legal)` layout renders it.
+	import type { Snippet } from 'svelte';
 	import { resolve } from '$app/paths';
-	import { LEGAL_ENTITY } from '$lib/legal/entity';
-	import { SITE } from '$lib/site';
+	import { currentBrand } from './brand';
 
-	let { children } = $props();
+	let { children }: { children: Snippet } = $props();
+
+	const brand = currentBrand();
 </script>
 
 <div class="shell">
 	<header>
-		<a class="back" href={resolve('/')}>
+		<a class="back" href={resolve(brand.home)}>
 			<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
 				<path
 					d="M15 18l-6-6 6-6"
@@ -18,7 +23,7 @@
 					stroke-linejoin="round"
 				/>
 			</svg>
-			Volver a {SITE.shortName}
+			Volver a {brand.shortName}
 		</a>
 	</header>
 
@@ -27,8 +32,8 @@
 	</main>
 
 	<footer>
-		<p>{LEGAL_ENTITY.name} · {LEGAL_ENTITY.taxIdLabel} {LEGAL_ENTITY.taxId}</p>
-		<p>{LEGAL_ENTITY.address}</p>
+		<p>{brand.entity.name} · {brand.entity.taxIdLabel} {brand.entity.taxId}</p>
+		<p>{brand.entity.address}</p>
 	</footer>
 </div>
 

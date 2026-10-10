@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import MailLink from '$lib/MailLink.svelte';
-	import PhoneLink from '$lib/PhoneLink.svelte';
-	import SeoHead from '$lib/SeoHead.svelte';
-	import { LEGAL_ENTITY } from '$lib/legal/entity';
-	import { TERMS_UPDATED } from '$lib/legal/versions';
-	import { HOURS, SITE } from '$lib/site';
+	import { BAKERY, HOURS } from '$lib/bakery/brand';
+	import { SITE } from '$lib/site';
+	import MailLink from '$lib/shared/MailLink.svelte';
+	import PhoneLink from '$lib/shared/PhoneLink.svelte';
+	import SeoHead from '$lib/shared/SeoHead.svelte';
 </script>
 
 <SeoHead
@@ -18,15 +17,15 @@
 
 <p class="lede">
 	Estas condiciones regulan el uso de {SITE.url.replace('https://', '')} y del canal de atención por WhatsApp
-	de {SITE.name}. Al usar cualquiera de los dos, las aceptás.
+	de {BAKERY.name}. Al usar cualquiera de los dos, las aceptás.
 </p>
 
-<p class="updated">Última actualización: {TERMS_UPDATED}</p>
+<p class="updated">Última actualización: {BAKERY.termsUpdated}</p>
 
 <h2>1. Quiénes somos</h2>
 <p>
-	<strong>{LEGAL_ENTITY.name}</strong> ({LEGAL_ENTITY.taxIdLabel}
-	{LEGAL_ENTITY.taxId}), con domicilio en {LEGAL_ENTITY.address}.
+	<strong>{BAKERY.entity.name}</strong> ({BAKERY.entity.taxIdLabel}
+	{BAKERY.entity.taxId}), con domicilio en {BAKERY.entity.address}.
 </p>
 
 <h2>2. Qué es este sitio</h2>
@@ -84,7 +83,7 @@
 
 <h2>5. Contenidos del sitio</h2>
 <p>
-	El nombre, el logo, los textos y las imágenes de este sitio pertenecen a {LEGAL_ENTITY.name} o se usan
+	El nombre, el logo, los textos y las imágenes de este sitio pertenecen a {BAKERY.entity.name} o se usan
 	con autorización. Podés compartir enlaces libremente; reproducir los contenidos con fines comerciales
 	requiere nuestro permiso.
 </p>
@@ -127,9 +126,9 @@
 
 <div class="contact">
 	<p>
-		<strong>{LEGAL_ENTITY.name}</strong> · {LEGAL_ENTITY.taxIdLabel}
-		{LEGAL_ENTITY.taxId}<br />
-		{LEGAL_ENTITY.address}<br />
+		<strong>{BAKERY.entity.name}</strong> · {BAKERY.entity.taxIdLabel}
+		{BAKERY.entity.taxId}<br />
+		{BAKERY.entity.address}<br />
 		<MailLink /> ·
 		<PhoneLink />
 	</p>

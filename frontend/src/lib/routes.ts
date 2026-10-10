@@ -6,5 +6,8 @@
 export const PUBLIC_ROUTES = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
 	{ path: '/privacy', changefreq: 'yearly', priority: '0.3' },
-	{ path: '/terms', changefreq: 'yearly', priority: '0.3' }
+	{ path: '/terms', changefreq: 'yearly', priority: '0.3' },
+	{ path: '/party-times', changefreq: 'monthly', priority: '0.8' },
+	{ path: '/party-times/privacy', changefreq: 'yearly', priority: '0.3' },
+	{ path: '/party-times/terms', changefreq: 'yearly', priority: '0.3' }
 ] as const;

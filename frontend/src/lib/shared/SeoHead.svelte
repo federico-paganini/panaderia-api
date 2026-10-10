@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SITE, absoluteUrl } from '$lib/site';
+	import { absoluteUrl } from '$lib/site';
+	import { currentBrand } from './brand';
 
 	interface Props {
 		/** Page title, without the site name — this component appends it. */
@@ -13,10 +14,14 @@
 
 	let { title, description, path, noindex = false }: Props = $props();
 
+	const brand = currentBrand();
+
 	// The canonical always points at the production domain (see `$lib/site`), so
-	// a Vercel preview never competes with the real page in an index.
+	// a preview never competes with the real page in an index.
 	const canonical = $derived(absoluteUrl(path));
-	const fullTitle = $derived(path === '/' ? title : `${title} — ${SITE.shortName}`);
+	// A brand's landing carries its own full title; every other page is
+	// suffixed with the brand it belongs to.
+	const fullTitle = $derived(path === brand.home ? title : `${title} — ${brand.titleSuffix}`);
 </script>
 
 <svelte:head>
@@ -25,7 +30,7 @@
 	<link rel="canonical" href={canonical} />
 
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content={SITE.name} />
+	<meta property="og:site_name" content={brand.name} />
 	<meta property="og:locale" content="es_UY" />
 	<meta property="og:title" content={fullTitle} />
 	<meta property="og:description" content={description} />

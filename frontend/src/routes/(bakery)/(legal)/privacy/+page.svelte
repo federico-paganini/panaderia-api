@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import MailLink from '$lib/MailLink.svelte';
-	import PhoneLink from '$lib/PhoneLink.svelte';
-	import SeoHead from '$lib/SeoHead.svelte';
-	import { LEGAL_ENTITY } from '$lib/legal/entity';
-	import { PRIVACY_UPDATED, RETENTION_DAYS } from '$lib/legal/versions';
-	import { ADDRESS, SITE } from '$lib/site';
+	import { ADDRESS, BAKERY, RETENTION_DAYS } from '$lib/bakery/brand';
+	import MailLink from '$lib/shared/MailLink.svelte';
+	import PhoneLink from '$lib/shared/PhoneLink.svelte';
+	import SeoHead from '$lib/shared/SeoHead.svelte';
 </script>
 
 <SeoHead
@@ -21,14 +19,14 @@
 	podés controlarlos. Cubre dos cosas distintas: este sitio y el canal de atención por WhatsApp.
 </p>
 
-<p class="updated">Última actualización: {PRIVACY_UPDATED}</p>
+<p class="updated">Última actualización: {BAKERY.privacyUpdated}</p>
 
 <h2>1. Quién es responsable</h2>
 <p>
-	<strong>{LEGAL_ENTITY.name}</strong> ({LEGAL_ENTITY.taxIdLabel}
-	{LEGAL_ENTITY.taxId}), con domicilio en {LEGAL_ENTITY.address}, es la responsable del tratamiento
-	de los datos descritos en esta política. Opera la Panadería y Confitería Las Delicias y el salón
-	de fiestas Las Delicias – Party Times.
+	<strong>{BAKERY.entity.name}</strong> ({BAKERY.entity.taxIdLabel}
+	{BAKERY.entity.taxId}), con domicilio en {BAKERY.entity.address}, es la responsable del
+	tratamiento de los datos descritos en esta política. Opera la Panadería y Confitería Las Delicias
+	y el salón de fiestas Las Delicias – Party Times.
 </p>
 <p>
 	Para cualquier cosa relacionada con tus datos, escribinos a
@@ -197,14 +195,14 @@
 
 <div class="contact">
 	<p>
-		<strong>{LEGAL_ENTITY.name}</strong> · {LEGAL_ENTITY.taxIdLabel}
-		{LEGAL_ENTITY.taxId}<br />
-		{LEGAL_ENTITY.address}<br />
+		<strong>{BAKERY.entity.name}</strong> · {BAKERY.entity.taxIdLabel}
+		{BAKERY.entity.taxId}<br />
+		{BAKERY.entity.address}<br />
 		<MailLink /> ·
 		<PhoneLink />
 	</p>
 	<p>
 		Ver también los <a href={resolve('/terms')}>términos y condiciones</a> de
-		{SITE.shortName}.
+		{BAKERY.shortName}.
 	</p>
 </div>

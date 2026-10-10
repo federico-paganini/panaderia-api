@@ -21,6 +21,18 @@ function routesOnDisk(): string[] {
 		.map((path) => (path === '/' ? '/' : path.replace(/\/$/, '')));
 }
 
+describe('brand route groups', () => {
+	it('hold every page', () => {
+		// Each page belongs to one business — the bakery or the party venue —
+		// and its group's `+layout.ts` is what tells the shared components which.
+		// A page outside both renders with no brand, and `currentBrand()` throws.
+		const outside = readdirSync('src/routes', { recursive: true, encoding: 'utf8' })
+			.filter((name) => name.endsWith('+page.svelte'))
+			.filter((name) => !/^\((bakery|party-times)\)[/\\]/.test(name));
+		expect(outside).toEqual([]);
+	});
+});
+
 describe('sitemap', () => {
 	const listed = PUBLIC_ROUTES.map((r) => r.path);
 

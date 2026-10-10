@@ -1,6 +1,8 @@
+import type { LegalEntity } from '$lib/shared/legal';
+
 /**
  * The legal entity behind the bakery and the WhatsApp bot, as registered with
- * Uruguay's DGI. The privacy policy and the terms both render it.
+ * Uruguay's DGI. The bakery's privacy policy and terms both render it.
  *
  * Meta's business verification matches the legal name and address against the
  * RUT certificate, so these must stay identical to it — the bot's app review
@@ -9,7 +11,7 @@
  * The check digit of the RUT below validates (weights 4,3,2,9,8,7,6,5,4,3,2;
  * sum 168, remainder 3, verifier 8).
  */
-export const LEGAL_ENTITY = {
+export const BAKERY_ENTITY: LegalEntity = {
 	name: 'GERALNA LTDA.',
 	form: 'Sociedad de responsabilidad limitada',
 	taxIdLabel: 'RUT',
@@ -24,4 +26,4 @@ export const LEGAL_ENTITY = {
 	// it has to keep receiving. Changing it means changing a published legal
 	// document, not just a constant.
 	contactEmail: 'privacidad@lasdeliciaslp.com'
-} as const;
+};
